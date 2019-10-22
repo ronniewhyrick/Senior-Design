@@ -106,10 +106,10 @@ void setup(void) {
   //tft.initR(INITR_MINI160x80);  // Init ST7735S mini display
 
   // OR use this initializer (uncomment) if using a 1.3" or 1.54" 240x240 TFT:
-  tft.init(240, 240);           // Init ST7789 240x240
+  //tft.init(240, 240);           // Init ST7789 240x240
 
   // OR use this initializer (uncomment) if using a 2.0" 320x240 TFT:
-  //tft.init(240, 320);           // Init ST7789 320x240
+  tft.init(240, 320);           // Init ST7789 320x240
 
   Serial.println(F("Initialized"));
 
@@ -133,6 +133,11 @@ void setup(void) {
   tft.drawPixel(tft.width()/2, tft.height()/2, ST77XX_GREEN);
   delay(500);
 
+  Serial.println("done");
+  delay(1000);
+}
+
+void loop() {
   // line draw test
   testlines(ST77XX_YELLOW);
   delay(500);
@@ -156,19 +161,6 @@ void setup(void) {
   delay(500);
 
   testtriangles();
-  delay(500);
-
-  mediabuttons();
-  delay(500);
-
-  Serial.println("done");
-  delay(1000);
-}
-
-void loop() {
-  tft.invertDisplay(true);
-  delay(500);
-  tft.invertDisplay(false);
   delay(500);
 }
 
