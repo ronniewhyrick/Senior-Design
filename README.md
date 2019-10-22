@@ -6,7 +6,7 @@ This repository conatins code offering function to the Arduino Uno and LoRa Bee 
 
 
 
-# Setup Instruction:
+## Setup Instruction:
 1.) Gather all files into machine directory.
 2.) Verify all necessary libraries are installed and referenced within the header.
-2.) Upload and execute Sourcecode.ino.
+3.) Upload and execute Sourcecode.ino.
