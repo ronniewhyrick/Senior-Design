@@ -24,45 +24,23 @@
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
 #include <SPI.h>
 
-#if defined(ESP32)
-  #define TFT_CS         5
-  #define TFT_RST        22 
-  #define TFT_DC         21
-  //
-  // define not needed for all pins; reference for ESP32 physical pins connections to VSPI:
-  // SDA  GPIO23 aka VSPI MOSI
-  // SCLK GPIO18 aka SCK aka VSPI SCK
-  // D/C  GPIO21 aka A0 (also I2C SDA)
-  // RST  GPIO22 aka RESET (also I2C SCL)
-  // CS   GPIO5  aka chip select
-  // LED  3.3V
-  // VCC  5V
-  // GND - GND
-  //
-#elif defined(ESP8266)
-  #define TFT_CS         4
-  #define TFT_RST        16                                            
-  #define TFT_DC         5
+// Pin definitions: 
+// See SPI Connections for more details (https://adafru.it/d5h)
+//
+// 3.3V - Voltage output
+// GND - GND
+// 13 - SCK (SPI clock)
+// 11 - MOSI (SPI MOSI)
+// 7* - CS (SPI Chip select)
+// 6* - RST (Display Reset)
+// 5* - D/C (SPI data/command select)
+// *Can be changed to any pin
 
-#else
-  // For the breakout board, you can use any 2 or 3 pins.
-  // These pins will also work for the 1.8" TFT shield.
-  #define TFT_CS         7
-  #define TFT_RST        6 // Or set to -1 and connect to Arduino RESET pin
-  #define TFT_DC         5
-#endif
+#define TFT_CS         7
+#define TFT_RST        6
+#define TFT_DC         5
 
-// OPTION 1 (recommended) is to use the HARDWARE SPI pins, which are unique
-// to each board and not reassignable. For Arduino Uno: MOSI = pin 11 and
-// SCLK = pin 13. This is the fastest mode of operation and is required if
-// using the breakout board's microSD card.
-
-// For 1.3", 1.54", and 2.0" TFT with ST7789:
-//Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
-
-
-// OPTION 2 lets you interface the display using ANY TWO or THREE PINS,
-// tradeoff being that performance is not as fast as hardware SPI above.
+// Interface the display using ANY TWO or THREE PINS
 #define TFT_MOSI 11  // Data out
 #define TFT_SCLK 13  // Clock out
 
