@@ -1,19 +1,3 @@
-/**************************************************************************
-  This is a library for several Adafruit displays based on ST77* drivers.
-  The 2.0" TFT breakout
-    ----> https://www.adafruit.com/product/4311
-
-  Check out the links above for our tutorials and wiring diagrams.
-  These displays use SPI to communicate, 4 or 5 pins are required to
-  interface (RST is optional).
-
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
-
-  Written by Limor Fried/Ladyada for Adafruit Industries.
-  MIT license, all text above must be included in any redistribution
- **************************************************************************/
 // This code is designed for display on 2.0" TFT 240x320 pixel screen.
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
@@ -66,30 +50,19 @@
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 
 void setup(void) {
-  Serial.begin(9600);
-  Serial.print(F("PalPack Test"));
-  
-  // Init ST7789 320x240
   tft.init(240, 320);           
-
-  Serial.println(F("Initialized"));
-  tft.fillScreen(ST77XX_BLACK);
-
-  // tft print function!
+  //tft.fillScreen(ST77XX_BLACK);
+  
   //startupScreen();
   printMap();
-
-  Serial.println("done");
-  delay(1000);
 }
 
-void loop() {}
+//void loop() {}
 
 // Printout for the startup display
 void startupScreen(){
   tft.setCursor(5, 110);
   tft.setTextColor(ST77XX_MAGENTA);
-  tft.setTextSize(3);
   tft.setFont(&FreeMono9pt7b);
   tft.setTextWrap(true);
   tft.println("Welcome");
@@ -100,6 +73,7 @@ void startupScreen(){
   delay(1000);
 }
 
+// Initialize map and prompts on display
 void printMap(){
   tft.fillScreen(ST77XX_BLACK);
   tft.setTextColor(ST77XX_GREEN);
@@ -107,31 +81,61 @@ void printMap(){
   tft.setCursor(0, 0);
   uint16_t radius = 0;
 
+  // Print system and coordinate prompts
   tft.setCursor(0,11);
   tft.println("System Status:");
   tft.setCursor(0,25);
   tft.println("Current coordinates:");
 
+  // Print current system status and coordinates
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setFont(&FreeMonoBold9pt7b);
+  tft.setCursor(155,11);
+  tft.println("ON"); //replace with status variable
+  tft.setCursor(0,41);
+  tft.println("39.1974° N, 96.5847° W"); //replace with coordinates variable
+  
   // Draws out sonar circles
   for (int16_t i = 0; i < 12; i++) {
     //void drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
-      tft.drawCircle(120, 160, radius, ST77XX_GREEN);
+      tft.drawCircle(120, 170, radius, ST77XX_GREEN);
       radius = radius + 10;
   }
   
-  tft.setCursor(0, 285);
+  // Print user origin position on map
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setFont(&FreeSansBold9pt7b);
+  tft.setCursor(114, 176);
+  tft.println("X");
+
+  tft.setFont();
+  tft.setTextColor(ST77XX_GREEN);
+//  tft.setCursor(106, 192);
+//  tft.println("1.5mi");
+//  tft.setCursor(106, 212);
+//  tft.println("1.5mi");
+//  tft.setCursor(106, 232);
+//  tft.println("1.5mi");
+//  tft.setCursor(106, 252);
+//  tft.println("1.5mi");
+  tft.setCursor(106, 272);
+  tft.println("1.5mi");
+
+  // Print available trakker prompt
+  tft.setTextColor(ST77XX_GREEN);
+  tft.setFont(&FreeMono9pt7b);
+  tft.setCursor(0, 315);
   tft.println("Trakkers available:");
-  tft.setCursor(205, 285);
-  tft.setTextColor(ST77XX_RED);
-  tft.println(".");
-  tft.setCursor(215, 285);
-  tft.setTextColor(ST77XX_BLUE);
-  tft.println(".");
-  tft.setCursor(225, 285);
-  tft.setTextColor(ST77XX_YELLOW);
-  tft.println(".");
+  tft.fillCircle(211,312,3,ST77XX_RED);
+  tft.fillCircle(223,312,3,ST77XX_BLUE);
+  tft.fillCircle(235,312,3,ST77XX_YELLOW);
 }
 
-void updateScreen(){
+void updateCoordinates(){
   
 }
+
+void updateTrakkers(){
+
+}
+
