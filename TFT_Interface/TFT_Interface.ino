@@ -51,24 +51,24 @@ Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RS
 
 void setup(void) {
   tft.init(240, 320);           
-  //tft.fillScreen(ST77XX_BLACK);
+  tft.fillScreen(ST77XX_BLACK);
   
-  //startupScreen();
+  startupScreen();
   printMap();
 }
 
-//void loop() {}
+void loop() {}
 
 // Printout for the startup display
 void startupScreen(){
-  tft.setCursor(5, 110);
+  tft.setCursor(20, 110);
   tft.setTextColor(ST77XX_MAGENTA);
-  tft.setFont(&FreeMono9pt7b);
+  tft.setFont(&FreeMonoBold24pt7b);
   tft.setTextWrap(true);
   tft.println("Welcome");
-  tft.setCursor(80, 157);
+  tft.setCursor(95, 157);
   tft.println("to");
-  tft.setCursor(5, 200);
+  tft.setCursor(20, 200);
   tft.println("PalPack");
   delay(1000);
 }
