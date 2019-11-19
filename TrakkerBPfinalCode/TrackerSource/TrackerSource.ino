@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
-SoftwareSerial GPSModule(10, 11); // RX, TX
-SoftwareSerial HC12(6, 5); // HC-12 TX Pin, HC-12 RX Pin
+SoftwareSerial GPSModule(5, 4); // RX, TX
+SoftwareSerial HC12(7, 6); // HC-12 TX Pin, HC-12 RX Pin
 int updates;
 int failedUpdates;
 int pos;
@@ -17,6 +17,7 @@ String lonfinal;
 String Hlatfinal;
 String Hlonfinal;
 String labels[12] {"Time: ", "Status: ", "Latitude: ", "Hemisphere: ", "Longitude: ", "Hemisphere: ", "Speed: ", "Track Angle: ", "Date: "};
+
 void setup() {
   Serial.begin(9600);
   GPSModule.begin(9600);
@@ -33,7 +34,6 @@ void loop() {
   {
     //Serial.print("eyo");
     GPSModule.read();
-
   }
   if (GPSModule.find("$GPRMC,")) {
     String tempMsg = GPSModule.readStringUntil('\n');
@@ -59,6 +59,7 @@ void loop() {
     Hlatfinal.toCharArray(tx_Hlat,20);
     lonfinal.toCharArray(tx_lon,20);
     Hlonfinal.toCharArray(tx_Hlon,20);
+    
     for (int i = 2; i < 6; i++) {
       Serial.print(labels[i]);
       Serial.print(nmea[i]);
@@ -73,11 +74,7 @@ void loop() {
     HC12.write(tx_Hlon);
     HC12.write('\n');
   }
-  else {
-
-    failedUpdates++;
-
-  }
+  else failedUpdates++;
   stringplace = 0;
   pos = 0;
 }
