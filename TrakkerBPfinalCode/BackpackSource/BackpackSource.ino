@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
 //establish two software serial ports
-SoftwareSerial GPSModule(10, 11); // RX, TX
+SoftwareSerial GPSModule(0, 1); // RX, TX
 SoftwareSerial HC12(6, 5); // HC-12 TX Pin, HC-12 RX Pin
 int updates;
 int failedUpdates;
