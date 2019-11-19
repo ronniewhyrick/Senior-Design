@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
 //establish two software serial ports
-SoftwareSerial GPSModule(5, 4); // RX, TX
+SoftwareSerial GPSModule(5, 6); // RX, TX
 SoftwareSerial Trakker(9, 10); // HC-12 TX Pin, HC-12 RX Pin
 int updates;
 int failedUpdates;
@@ -18,7 +18,7 @@ String Hlatfinal;
 String Hlonfinal;
 String labels[12] {"Time: ", "Status: ", "Latitude: ", "Hemisphere: ", "Longitude: ", "Hemisphere: ", "Speed: ", "Track Angle: ", "Date: "};
 //backpack unique variables
-char rx_init;
+char rx_init[50];
 bool done = false; // Listen check complete (0 = false, 1 = true)
 
 void setup() {
@@ -29,13 +29,13 @@ void setup() {
   Serial.println("Setup Complete");
 }
 
-void loop() {     //following code till end of loop is for testing w/o GPS only. allows data to be recieved without having a working GPS.
+void loop() {     
   Serial.flush();
+  
   //Begin reading GPS module
-  //GPSModule.listen(); // Priority set to GPS
-  while ((GPSModule.available())) //if new GPS data is available and all other process complete
+  while ((GPSModule.available()))
   {
-    //activate software serial to GPS port, ignore Trakker port
+    //Flush GPS buffer and begin reading data
     GPSModule.flush();
     GPSModule.read();
     
@@ -52,47 +52,48 @@ void loop() {     //following code till end of loop is for testing w/o GPS only.
           nmea[pos] = tempMsg.substring(stringplace, i);
         }
       }updates++;
-    //call functions to convert nmea long and lat to readable degrees
-    nmea[2] = ConvertLat();
-    nmea[4] = ConvertLng();
-    Serial.print("filtered self GPS coordinates \n");
-    //enable Trakker Software Serial port.
-    //convert string arrays to strings, then character arrays
-    latfinal = nmea[2];
-    Hlatfinal = nmea[3];
-    lonfinal = nmea[4];
-    Hlonfinal = nmea[5]; 
-    latfinal.toCharArray(tx_lat,20);
-    Hlatfinal.toCharArray(tx_Hlat,20);
-    lonfinal.toCharArray(tx_lon,20);
-    Hlonfinal.toCharArray(tx_Hlon,20);
-    //print on monitor final self GPS values with labels
+      
+      //Convert nmea longitude and latitude to readable degrees
+      nmea[2] = ConvertLat();
+      nmea[4] = ConvertLng();
+      Serial.print("filtered self GPS coordinates \n");
+      //Convert string arrays to strings, then character arrays
+      latfinal = nmea[2];
+      Hlatfinal = nmea[3];
+      lonfinal = nmea[4];
+      Hlonfinal = nmea[5]; 
+      latfinal.toCharArray(tx_lat,20);
+      Hlatfinal.toCharArray(tx_Hlat,20);
+      lonfinal.toCharArray(tx_lon,20);
+      Hlonfinal.toCharArray(tx_Hlon,20);
+      
+      //Print final GPS values with labels
       for (int i = 2; i < 6; i++) {
         Serial.print(labels[i]);
         Serial.print(nmea[i]);
         Serial.println("");
       }
-     //Serial.println(Trakker.isListening());
     }
     else failedUpdates++;
+    
     // Reset values and jump out of GPS while loop
     stringplace = 0;
     pos = 0;
-    //Begin reading Trakker clips
+    
     Trakker.listen(); //Priority set to trakker clips
   }
-  
+
+  //Begin reading Trakker clips
   while (Trakker.available())
   {
-     rx_init = Trakker.read();
-     Serial.println(Trakker.read());
-     Serial.print(rx_init);
-     GPSModule.listen(); // Priority set to GPS
+    String rx_init = Trakker.readStringUntil('\n');
+    Serial.print("rx_init: ");
+    Serial.println(rx_init);
+    GPSModule.listen(); // Priority set to GPS
   }
 }//end of void loop()
 
 
-//everything below are just functions to convert nmea data to readable degrees and hemispherical information
 String ConvertLat() {
   String posneg = "";
   if (nmea[3] == "S") {
