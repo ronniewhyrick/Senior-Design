@@ -38,9 +38,9 @@
 // 5* - D/C (SPI data/command select)
 // *Can be changed to any pin
 
-#define TFT_CS         10
-#define TFT_RST        9
-#define TFT_DC         8
+#define TFT_CS         8
+#define TFT_RST        7
+#define TFT_DC         4
 
 // Interface the display using ANY TWO or THREE PINS
 #define TFT_MOSI 11  // Data out
