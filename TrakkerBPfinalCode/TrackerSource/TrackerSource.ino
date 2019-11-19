@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
-SoftwareSerial GPSModule(5, 4); // RX, TX
-SoftwareSerial HC12(7, 6); // HC-12 TX Pin, HC-12 RX Pin
+SoftwareSerial GPSModule(5, 6); // RX, TX
+SoftwareSerial HC12(9, 10); // HC-12 TX Pin, HC-12 RX Pin
 int updates;
 int failedUpdates;
 int pos;
@@ -73,10 +73,17 @@ void loop() {
     HC12.write(",");
     HC12.write(tx_Hlon);
     HC12.write('\n');
+    delay(1000);
   }
   else failedUpdates++;
   stringplace = 0;
   pos = 0;
+  HC12.listen();
+ while (1)
+ {
+  HC12.write("Transmit gud");
+  delay(1000);
+ }
 }
 
 String ConvertLat() {
