@@ -95,8 +95,10 @@ void loop() {
     String T_Latitude = rx_init.substring(rx_init.indexOf(",",del1 + 2) + 1,rx_init.length() - 2); //prints longitude substring //might  have to be -4 at the end for \n attatched
     Serial.println(T_Longitude);
     Serial.println(T_Latitude);
-    GPSModule.listen(); // Priority set to GPS
+    //GPSModule.listen(); // Priority set to GPS
   }
+ //normalized coordinate system. 
+
 }//end of void loop()
 
 
