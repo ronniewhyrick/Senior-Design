@@ -89,6 +89,12 @@ void loop() {
     String rx_init = Trakker.readStringUntil('\n');
     Serial.print("rx_init: ");
     Serial.println(rx_init);
+    String T_Longitude = rx_init.substring(0,rx_init.indexOf(",")); //prints longitude substring
+    int del1 = T_Longitude.length();
+    Serial.println(del1);
+    String T_Latitude = rx_init.substring(rx_init.indexOf(",",del1 + 2) + 1,rx_init.length() - 2); //prints longitude substring //might  have to be -4 at the end for \n attatched
+    Serial.println(T_Longitude);
+    Serial.println(T_Latitude);
     GPSModule.listen(); // Priority set to GPS
   }
 }//end of void loop()
