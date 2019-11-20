@@ -59,19 +59,19 @@ int updates;
 int failedUpdates;
 int pos;
 int stringplace = 0;
-char tx_lat[20];
-char tx_lon[20];
-char tx_Hlat[20];
-char tx_Hlon[20];
+char tx_lat[10];
+char tx_lon[10];
+char tx_Hlat[10];
+char tx_Hlon[10];
 String timeUp;
 String nmea[15];
 String latfinal;
 String lonfinal;
 String Hlatfinal;
 String Hlonfinal;
-String labels[12] {"Time: ", "Status: ", "Latitude: ", "Hemisphere: ", "Longitude: ", "Hemisphere: ", "Speed: ", "Track Angle: ", "Date: "};
+String labels[4] {"Latitude: ", "Hemisphere: ", "Longitude: ", "Hemisphere: "};
 //Backpack unique variables
-char rx_init[50];
+char rx_init[30];
 bool done = false; // Listen check complete (0 = false, 1 = true)
 
 void setup() {
@@ -92,17 +92,17 @@ void setup() {
 
 void loop() {     
   Serial.flush();
-  float T_LonInt;
-  float T_LatInt;
-  float B_LonInt;
-  float B_LatInt; 
-  float DeltaLon;
-  float DeltaLat;
-  double DeltaLon1;
-  double DeltaLat1;
-  float distance;
-  double ratio;
-  double degree;
+  const float T_LonInt;
+  const float T_LatInt;
+  const float B_LonInt;
+  const float B_LatInt; 
+  const float DeltaLon;
+  const float DeltaLat;
+  const double DeltaLon1;
+  const double DeltaLat1;
+  const float distance;
+  const double ratio;
+  const double degree;
   
   //Begin reading GPS module
   while ((GPSModule.available()))
@@ -128,7 +128,7 @@ void loop() {
       //Convert nmea longitude and latitude to readable degrees
       nmea[2] = ConvertLat();
       nmea[4] = ConvertLng();
-      Serial.print("filtered self GPS coordinates \n");
+      Serial.print(F("filtered self GPS coordinates \n"));
       
       //Convert string arrays to strings, then character arrays
       latfinal = nmea[2];
@@ -292,11 +292,11 @@ void startupScreen(){
   tft.setTextColor(ST77XX_MAGENTA);
   tft.setFont(&FreeMonoBold24pt7b);
   tft.setTextWrap(true);
-  tft.println("Welcome");
+  tft.println(F("Welcome"));
   tft.setCursor(95, 157);
-  tft.println("to");
+  tft.println(F("to"));
   tft.setCursor(20, 200);
-  tft.println("PalPack");
+  tft.println(F("PalPack"));
   delay(1000);
 }
 
@@ -310,17 +310,17 @@ void printMap(){
 
   // Print system and coordinate prompts
   tft.setCursor(0,11);
-  tft.println("System Status:");
+  tft.println(F("System Status:"));
   tft.setCursor(0,25);
-  tft.println("Current coordinates:");
+  tft.println(F("Current coordinates:"));
 
   // Print current system status and coordinates
   tft.setTextColor(ST77XX_WHITE);
   tft.setFont(&FreeMonoBold9pt7b);
   tft.setCursor(155,11);
-  tft.println("ON"); //replace with status variable
+  //tft.println(F("ON")); //replace with status variable
   tft.setCursor(0,41);
-  tft.println("39.1974° N, 96.5847° W"); //replace with coordinates variable
+  //tft.println(F("39.1974° N, 96.5847° W")); //replace with coordinates variable
   
   // Draws out sonar circles
   for (int16_t i = 0; i <= 5; i++) {
@@ -333,13 +333,14 @@ void printMap(){
   // Print user origin position on map
   tft.setTextColor(ST77XX_WHITE);
   tft.setFont(&FreeSansBold9pt7b);
-  tft.setCursor(114, 170);
-  tft.println("X");
+  //tft.setCursor(114, 170);
+  //tft.println("X");
+  tft.drawChar(114,170,X,ST77XX_WHITE,ST77XX_BLACK,9);
 
   tft.setFont();
   tft.setTextColor(ST77XX_GREEN);
   tft.setCursor(106, 258);
-  tft.println("4.0 m");
+  tft.println(F("4.0 m"));
 
 //  tft.setCursor(158, 312);
 //  tft.setTextColor(ST77XX_RED);
@@ -350,12 +351,12 @@ void printMap(){
   tft.setTextColor(ST77XX_GREEN);
   tft.setFont(&FreeMono9pt7b);
   tft.setCursor(0, 300);
-  tft.println("Trakkers available:");
+  tft.println(F("Trakkers available:"));
   tft.fillCircle(211,297,3,ST77XX_RED);
   tft.fillCircle(223,297,3,ST77XX_BLUE);
   tft.fillCircle(235,297,3,ST77XX_YELLOW);
   tft.setCursor(0, 315);
-  tft.println("Out of bounds:");
+  tft.println(F("Out of bounds:"));
   //tft.fillCircle(158,312,3,ST77XX_RED);
   //tft.fillCircle(170,312,3,ST77XX_BLUE);
   //tft.fillCircle(182,312,3,ST77XX_YELLOW);
