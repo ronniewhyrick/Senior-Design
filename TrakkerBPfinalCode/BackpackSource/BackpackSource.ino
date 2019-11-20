@@ -38,7 +38,11 @@ void loop() {
   float B_LatInt; 
   float DeltaLon;
   float DeltaLat;
+  double DeltaLon1;
+  double DeltaLat1;
   float distance;
+  double ratio;
+  double degree;
   //Begin reading GPS module
   while ((GPSModule.available()))
   {
@@ -112,6 +116,7 @@ void loop() {
      Serial.println(abs(B_LonInt),8);
 //     Serial.println(B_LonInt,8);
 //     Serial.println(B_LatInt,8);
+     
      //find magnitude of distance between tracker and backpack
      DeltaLon = abs(B_LonInt) - abs(T_LonInt);
      Serial.println(DeltaLon,8);
@@ -120,7 +125,45 @@ void loop() {
      distance = sqrt((DeltaLat*DeltaLat) + (DeltaLon*DeltaLon));
      Serial.print("Distance is: ");
      Serial.println(distance,8);
-    //GPSModule.listen(); // Priority set to GPS
+    //Degree finder
+    if (T_LonInt > B_LonInt) // Tracker is North of Backpack
+    {
+      if (T_LatInt > B_LatInt) //Tracker is North-East of Backpack
+      {
+       //First Quadrant
+       // x & y are positive
+     DeltaLon1 =  100000 * abs(DeltaLon);
+     DeltaLat1 =  100000 * abs(DeltaLat);
+      }
+      else //Tracker is North-West of Backpack
+      {
+     DeltaLon1 = 100000 * abs(DeltaLon);
+     DeltaLat1 = -1 * 100000 * abs(DeltaLat);
+      }
+    }
+    else //Tracker is South of Backpack
+    {
+      if (T_LatInt > B_LatInt) //Tracker is South-East of Backpack
+      {
+      //Fourth Quadrant
+      //x positive, y negative
+     DeltaLon1 = -1 * 100000 * abs(DeltaLon);
+     DeltaLat1 = 100000 * abs(DeltaLat);
+      }
+      else //Tracker is South-West of Backpack
+      {
+      //Third Quadrant 
+      // both negative
+     DeltaLon1 = -1 * 100000 * abs(DeltaLon);
+     DeltaLat1 = -1 * 100000 * abs(DeltaLat);
+      }
+  }
+     Serial.println(DeltaLat1);
+     Serial.println(DeltaLon1);
+     ratio = (DeltaLon1)/(DeltaLat1);
+     Serial.println(ratio);
+     degree = (180 * atan(ratio))/3.14159265359;
+     Serial.println(degree);  
   }
   
  
