@@ -1,7 +1,6 @@
 // This code is designed for display on 2.0" TFT 240x320 pixel screen.
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
-#include <SPI.h>
 #include <gfxfont.h>
 
 // Font definitions:
@@ -53,7 +52,7 @@ void setup(void) {
   tft.init(240, 320);           
   tft.fillScreen(ST77XX_BLACK);
   
-  startupScreen();
+  //startupScreen();
   printMap();
 }
 
@@ -78,7 +77,7 @@ void printMap(){
   tft.fillScreen(ST77XX_BLACK);
   tft.setTextColor(ST77XX_GREEN);
   tft.setFont(&FreeMono9pt7b);
-  tft.setCursor(0, 0);
+  tft.setCursor(0,0);
   uint16_t radius = 0;
 
   // Print system and coordinate prompts
@@ -96,39 +95,42 @@ void printMap(){
   tft.println("39.1974° N, 96.5847° W"); //replace with coordinates variable
   
   // Draws out sonar circles
-  for (int16_t i = 0; i < 12; i++) {
+  for (int16_t i = 0; i <= 5; i++) {
+  //for (int16_t i = 0; i < 12; i++) {
     //void drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
-      tft.drawCircle(120, 170, radius, ST77XX_GREEN);
-      radius = radius + 10;
+      tft.drawCircle(120, 164, radius, ST77XX_GREEN);
+      radius = radius + 22;
   }
   
   // Print user origin position on map
   tft.setTextColor(ST77XX_WHITE);
   tft.setFont(&FreeSansBold9pt7b);
-  tft.setCursor(114, 176);
+  tft.setCursor(114, 170);
   tft.println("X");
 
   tft.setFont();
   tft.setTextColor(ST77XX_GREEN);
-//  tft.setCursor(106, 192);
-//  tft.println("1.5mi");
-//  tft.setCursor(106, 212);
-//  tft.println("1.5mi");
-//  tft.setCursor(106, 232);
-//  tft.println("1.5mi");
-//  tft.setCursor(106, 252);
-//  tft.println("1.5mi");
-  tft.setCursor(106, 272);
-  tft.println("1.5mi");
+  tft.setCursor(106, 258);
+  tft.println("4.0 m");
+
+//  tft.setCursor(158, 312);
+//  tft.setTextColor(ST77XX_RED);
+//  tft.setFont(&FreeSansBold9pt7b);
+//  tft.println("< V > ^");
 
   // Print available trakker prompt
   tft.setTextColor(ST77XX_GREEN);
   tft.setFont(&FreeMono9pt7b);
-  tft.setCursor(0, 315);
+  tft.setCursor(0, 300);
   tft.println("Trakkers available:");
-  tft.fillCircle(211,312,3,ST77XX_RED);
-  tft.fillCircle(223,312,3,ST77XX_BLUE);
-  tft.fillCircle(235,312,3,ST77XX_YELLOW);
+  tft.fillCircle(211,297,3,ST77XX_RED);
+  tft.fillCircle(223,297,3,ST77XX_BLUE);
+  tft.fillCircle(235,297,3,ST77XX_YELLOW);
+  tft.setCursor(0, 315);
+  tft.println("Out of bounds:");
+  //tft.fillCircle(158,312,3,ST77XX_RED);
+  //tft.fillCircle(170,312,3,ST77XX_BLUE);
+  //tft.fillCircle(182,312,3,ST77XX_YELLOW);
 }
 
 void updateCoordinates(){
