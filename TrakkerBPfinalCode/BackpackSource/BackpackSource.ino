@@ -1,4 +1,5 @@
 #include <SoftwareSerial.h>
+#define abs(x) ((x)>0?(x):-(x))
 //establish two software serial ports
 SoftwareSerial GPSModule(5, 6); // RX, TX
 SoftwareSerial Trakker(9, 10); // HC-12 TX Pin, HC-12 RX Pin
@@ -31,7 +32,13 @@ void setup() {
 
 void loop() {     
   Serial.flush();
-  
+  float T_LonInt;
+  float T_LatInt;
+  float B_LonInt;
+  float B_LatInt; 
+  float DeltaLon;
+  float DeltaLat;
+  float distance;
   //Begin reading GPS module
   while ((GPSModule.available()))
   {
@@ -87,18 +94,36 @@ void loop() {
   while (Trakker.available())
   {
     String rx_init = Trakker.readStringUntil('\n');
-    Serial.print("rx_init: ");
-    Serial.println(rx_init);
+//    Serial.print("rx_init: ");
+//    Serial.println(rx_init);
     String T_Longitude = rx_init.substring(0,rx_init.indexOf(",")); //prints longitude substring
+    T_LonInt = T_Longitude.toFloat();
     int del1 = T_Longitude.length();
-    Serial.println(del1);
     String T_Latitude = rx_init.substring(rx_init.indexOf(",",del1 + 2) + 1,rx_init.length() - 2); //prints longitude substring //might  have to be -4 at the end for \n attatched
-    Serial.println(T_Longitude);
-    Serial.println(T_Latitude);
+    T_LatInt = T_Latitude.toFloat();
+    Serial.println(T_LonInt,8);
+    Serial.println(T_LatInt,8);
+     //normalized coordinate system. 
+     // 1m / 0.00001 degree change
+     
+     //Example Coordinates
+     B_LonInt = 39.190953;
+     B_LatInt = -096.584159;
+     Serial.println(abs(B_LonInt),8);
+//     Serial.println(B_LonInt,8);
+//     Serial.println(B_LatInt,8);
+     //find magnitude of distance between tracker and backpack
+     DeltaLon = abs(B_LonInt) - abs(T_LonInt);
+     Serial.println(DeltaLon,8);
+     DeltaLat = abs(B_LatInt) - abs(T_LatInt);
+     Serial.println(DeltaLat,8);
+     distance = sqrt((DeltaLat*DeltaLat) + (DeltaLon*DeltaLon));
+     Serial.print("Distance is: ");
+     Serial.println(distance,8);
     //GPSModule.listen(); // Priority set to GPS
   }
- //normalized coordinate system. 
-
+  
+ 
 }//end of void loop()
 
 
