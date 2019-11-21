@@ -26,7 +26,7 @@ void setup() {
   //initialize software serial for GPS then Trakker
   Trakker.begin(9600);
   GPSModule.begin(9600);
-  Serial.println("Setup Complete");
+ // Serial.println("Setup Complete");
 }
 void loop() {     
   Serial.flush();
@@ -42,8 +42,10 @@ void loop() {
   double ratio;
   double degree;
   //Begin reading GPS module
+  delay(500);
   while ((GPSModule.available()))
   {
+   // Serial.println("entered gps");
     //Flush GPS buffer and begin reading data
     GPSModule.flush();
     GPSModule.read();
@@ -65,7 +67,7 @@ void loop() {
       //Convert nmea longitude and latitude to readable degrees
       nmea[2] = ConvertLat();
       nmea[4] = ConvertLng();
-      Serial.print("filtered self GPS coordinates \n");
+      //Serial.print("filtered self GPS coordinates \n");
       //Convert string arrays to strings, then character arrays
       latfinal = nmea[2];
       Hlatfinal = nmea[3];
@@ -77,11 +79,11 @@ void loop() {
       Hlonfinal.toCharArray(tx_Hlon,20);
       
       //Print final GPS values with labels
-      for (int i = 2; i < 6; i++) {
-        Serial.print(labels[i]);
-        Serial.print(nmea[i]);
-        Serial.println("");
-      }
+//      for (int i = 2; i < 6; i++) {
+//        Serial.print(labels[i]);
+//        Serial.print(nmea[i]);
+//        Serial.println("");
+//      }
     }
     else failedUpdates++;
     
@@ -90,38 +92,58 @@ void loop() {
     pos = 0;
     
     Trakker.listen(); //Priority set to trakker clips
+    
   }
+
+      
+ // Serial.println("JO");
   //Begin reading Trakker clips
+  for (int j = 0; j < 1; j++)
+  {
+    if (j == 0)
+    {
+     Trakker.write("Tx1\n");
+    // Serial.println("sending code");
+    delay(1000);
+    }
+    else if (j == 1)
+    {
+     Trakker.write("Tx2\n"); 
+    }
+    else { Trakker.write("Tx3\n");
+    }
+    delay (100);
+    ////Serial.print("Iteration: ");
   while (Trakker.available())
   {
     String rx_init = Trakker.readStringUntil('\n');
-//    Serial.print("rx_init: ");
-//    Serial.println(rx_init);
+    Serial.print("rx_init: ");
+    Serial.println(rx_init);
     String T_Longitude = rx_init.substring(0,rx_init.indexOf(",")); //prints longitude substring
     T_LonInt = T_Longitude.toFloat();
     int del1 = T_Longitude.length();
     String T_Latitude = rx_init.substring(rx_init.indexOf(",",del1 + 2) + 1,rx_init.length() - 2); //prints longitude substring //might  have to be -4 at the end for \n attatched
     T_LatInt = T_Latitude.toFloat();
-    Serial.println(T_LonInt,8);
-    Serial.println(T_LatInt,8);
+    //Serial.println(T_LonInt,8);
+    //Serial.println(T_LatInt,8);
      //normalized coordinate system. 
      // 1m / 0.00001 degree change
      
      //Example Coordinates
      B_LonInt = 39.190953;
      B_LatInt = -096.584159;
-     Serial.println(abs(B_LonInt),8);
+     //Serial.println(abs(B_LonInt),8);
 //     Serial.println(B_LonInt,8);
 //     Serial.println(B_LatInt,8);
 
      //find magnitude of distance between tracker and backpack
      DeltaLon = abs(B_LonInt) - abs(T_LonInt);
-     Serial.println(DeltaLon,8);
+   //  Serial.println(DeltaLon,8);
      DeltaLat = abs(B_LatInt) - abs(T_LatInt);
-     Serial.println(DeltaLat,8);
+   //  Serial.println(DeltaLat,8);
      distance = sqrt((DeltaLat*DeltaLat) + (DeltaLon*DeltaLon));
-     Serial.print("Distance is: ");
-     Serial.println(distance,8);
+    // Serial.print("Distance is: ");
+   //  Serial.println(distance,8);
     //GPSModule.listen(); // Priority set to GPS
     //Degree finder
     if (T_LonInt > B_LonInt) // Tracker is North of Backpack
@@ -156,14 +178,17 @@ void loop() {
      DeltaLat1 = -1 * 100000 * abs(DeltaLat);
       }
   }
-     Serial.println(DeltaLat1);
-     Serial.println(DeltaLon1);
+  //   Serial.println(DeltaLat1);
+//Serial.println(DeltaLon1);
      ratio = (DeltaLon1)/(DeltaLat1);
-     Serial.println(ratio);
+    // Serial.println(ratio);
      degree = (180 * atan(ratio))/3.14159265359;
-     Serial.println(degree);  
+  //  Serial.println(degree);  
   }
-
+  //Serial.println("Left while");
+  }
+  //Serial.println("Left For");
+  GPSModule.listen();
 
 }//end of void loop()
 String ConvertLat() {
@@ -201,9 +226,7 @@ String ConvertLng() {
   for (int i = 0; i < nmea[4].length(); i++) {
     if (nmea[4].substring(i, i + 1) == ".") {
       lngfirst = nmea[4].substring(0, i - 2);
-      //Serial.println(lngfirst);
       lngsecond = nmea[4].substring(i - 2).toFloat();
-      //Serial.println(lngsecond);
     }
   }
   lngsecond = lngsecond / 60;
