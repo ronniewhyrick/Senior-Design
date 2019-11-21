@@ -2,6 +2,7 @@
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
 #include <gfxfont.h>
+#include <SoftwareSerial.h>
 
 // Font definitions:
 #include <Fonts/FreeMono9pt7b.h>
@@ -47,16 +48,31 @@
 
 // For the ST7789-based displays, we will use this call
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
+SoftwareSerial Backpack(6,5);
+
+float Lat = -096.582849;
+float Lon = 39.188239;
+String LatS;
+String LonS;
+String txData;
 
 void setup(void) {
   tft.init(240, 320);           
   tft.fillScreen(ST77XX_BLACK);
+  Backpack.begin(9600);
   
   //startupScreen();
   printMap();
 }
 
-void loop() {}
+void loop() {
+  Lat += 0.00002;
+  Lon -= 0.00001;
+  LatS = String(Lat,6);
+  LonS = String(Lon,6);
+  txData = LatS+",N,"+LonS+",W\n";
+  Serial.println(txData);
+}
 
 // Printout for the startup display
 void startupScreen(){
