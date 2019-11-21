@@ -75,19 +75,19 @@ void loop() {
       BLon += 0.00001;
       TLat += 0.00002;
       TLon -= 0.00001;
-      BLatS = String(BLat,6);
-      BLonS = String(BLon,6);
-      TLatS = String(TLat,6);
-      TLonS = String(TLon,6);
-      userLoc = BLatS + ",N," + BLonS + ",W\n";
-      trakLoc = TLatS + ",N," + TLonS + ",W\n";
+      BLatS = String(BLat,5);
+      BLonS = String(BLon,5);
+      TLatS = String(TLat,5);
+      TLonS = String(TLon,5);
+      userLoc = BLatS + "N, " + BLonS + "W";
+      trakLoc = TLatS + "N, " + TLonS + "W";
       Serial.print("userLoc: ");
       Serial.println(userLoc);
       Serial.print("trakLoc: ");
       Serial.println(trakLoc);
       updateCoordinates(userLoc); //Update user's coordinate position
       i++;
-      delay(1000);
+      delay(2500);
   }
 }
 
@@ -140,6 +140,13 @@ void printMap(){
   tft.setCursor(106, 258);
   tft.println("4.0 m");
 
+  // Print user origin position on map
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setFont(&FreeSansBold9pt7b);
+  tft.setCursor(114, 176);
+  tft.setCursor(114, 170);
+  tft.println("X");
+
 //  tft.setCursor(158, 312);
 //  tft.setTextColor(ST77XX_RED);
 //  tft.setFont(&FreeSansBold9pt7b);
@@ -166,12 +173,52 @@ String updateCoordinates(String userLoc){
   tft.setTextColor(ST77XX_WHITE);
   tft.println(userLoc); //replace with coordinates variable
   lastLoc = userLoc;
-  Serial.println("lastLoc: ");
-  Serial.println(lastLoc);
+  //Serial.print("lastLoc: ");
+  //Serial.println(lastLoc);
   return lastLoc;
 }
 
-void updateTrakkers(float Lat, float Lon){
+#define abs(x) ((x)>0?(x):-(x))
+//float DeltaLatF, DeltaLonF;
+//double DeltaLatD, DeltaLonD;
+//double ratio, degree;
+
+void updateTrakkers(float BLat, float BLon, float TLat, float TLon){
+  float DeltaLatF = abs(BLat) - abs(TLat);
+  float DeltaLonF = abs(BLon) - abs(TLon);
+  float distance = sqrt((DeltaLatF*DeltaLatF) + (DeltaLonF*DeltaLonF));
+  
+  if (TLon > BLon) { // Tracker is North of Backpack
+    if (TLat > BLat) {//Tracker is North-East of Backpack
+      //First Quadrant
+      // x postive, y positive
+      double DeltaLatD =  100000 * abs(DeltaLatF);
+      double DeltaLonD =  100000 * abs(DeltaLonF);
+    }
+    else { //Tracker is North-West of Backpack
+      //Second Quadrant
+      //x negative, y postive
+      DeltaLatD = -1 * 100000 * abs(DeltaLatF);
+      DeltaLonD = 100000 * abs(DeltaLonF);
+    }
+  }
+  else { //Tracker is South of Backpack
+    if (TLat > BLat) { //Tracker is South-East of Backpack
+      //Fourth Quadrant
+      //x positive, y negative
+      DeltaLatD = 100000 * abs(DeltaLatF);
+      DeltaLonD = -1 * 100000 * abs(DeltaLonF);
+    }
+    else { //Tracker is South-West of Backpack
+      //Third Quadrant 
+      // x negative, y negative
+      DeltaLatD = -1 * 100000 * abs(DeltaLatF);
+      DeltaLonD = -1 * 100000 * abs(DeltaLonF);
+    }
+  }
+  double ratio = (DeltaLonD)/(DeltaLatD);
+  double degree = (180 * atan(ratio))/3.14159265359;
+
   //tft.fillCircle(158,312,3,ST77XX_RED);
   //tft.fillCircle(170,312,3,ST77XX_BLUE);
   //tft.fillCircle(182,312,3,ST77XX_YELLOW);
