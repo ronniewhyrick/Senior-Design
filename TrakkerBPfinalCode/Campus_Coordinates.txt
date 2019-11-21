@@ -1,0 +1,28 @@
+- degree Latitude -> if less than 0, western hemisphere, greater -> Eastern Hemisphere. 
+
+				- Longitude,	Latitude
+Trakker locations
+--------------------
+Arrow Coffee			- 39.193602,N,-096.585778,W\n
+Hale Library 			- 39.190983,N,-096.580575,W\n
+Old Stadium			- 39.187612,N,-096.583708,W\n
+---------------------
+
+bounds
+
+fairchild - 
+
+
+
+userLoc: 39.19097N, -96.58421W
+userLoc: 39.19098N, -96.58423W
+userLoc: 39.19099N, -96.58425W
+userLoc: 39.19101N, -96.58427W
+userLoc: 39.19102N, -96.58430W
+
+
+trakLoc: 39.18822N, -96.58279W
+trakLoc: 39.18821N, -96.58277W
+trakLoc: 39.18819N, -96.58275W
+trakLoc: 39.18818N, -96.58273W
+trakLoc: 39.18817N, -96.58270W

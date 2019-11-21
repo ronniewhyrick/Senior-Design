@@ -174,15 +174,15 @@ void loop() {
       {
       //Third Quadrant 
       // both negative
-     DeltaLon1 = -1 * 100000 * abs(DeltaLon);
-     DeltaLat1 = -1 * 100000 * abs(DeltaLat);
+     DeltaLon1 = -1 * 100000 * abs(DeltaLon);       <--------
+     DeltaLat1 = -1 * 100000 * abs(DeltaLat);       <--------
       }
   }
   //   Serial.println(DeltaLat1);
 //Serial.println(DeltaLon1);
      ratio = (DeltaLon1)/(DeltaLat1);
     // Serial.println(ratio);
-     degree = (180 * atan(ratio))/3.14159265359;
+     degree = (180 * atan(ratio))/3.14159265359;     <--------
   //  Serial.println(degree);  
   }
   //Serial.println("Left while");

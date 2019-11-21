@@ -13,7 +13,7 @@ void setup() {
   HC12.begin(9600);               // Serial port to HC12
 }
 
-void loop() {
+void loop() {001
   Lat += 0.00002;
   Lon -= 0.00001;
   LatS = String(Lat,6);

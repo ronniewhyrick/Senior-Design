@@ -70,7 +70,7 @@ void setup(void) {
   Backpack.begin(9600);
   Serial.begin(9600);
   
-  //startupScreen();
+  startupScreen();
   printMap();
 }
 
