@@ -1,0 +1,13 @@
+- degree Latitude -> if less than 0, western hemisphere, greater -> Eastern Hemisphere. 
+
+				- Longitude,	Latitude
+Trakker locations
+--------------------
+Arrow Coffee			- 39.193602,N,-096.585778,W\n
+Hale Library 			- 39.190983,N,-096.580575,W\n
+Old Stadium			- 39.187612,N,-096.583708,W\n
+---------------------
+
+bounds
+
+fairchild - 
