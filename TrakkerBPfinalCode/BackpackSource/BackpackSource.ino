@@ -19,7 +19,7 @@ String Hlatfinal;
 String Hlonfinal;
 String labels[12] {"Time: ", "Status: ", "Latitude: ", "Hemisphere: ", "Longitude: ", "Hemisphere: ", "Speed: ", "Track Angle: ", "Date: "};
 //backpack unique variables
-char rx_init[50];
+char rx_in[50];
 bool done = false; // Listen check complete (0 = false, 1 = true)
 void setup() {
   Serial.begin(9600);
@@ -67,7 +67,7 @@ void loop() {
       //Convert nmea longitude and latitude to readable degrees
       nmea[2] = ConvertLat();
       nmea[4] = ConvertLng();
-      //Serial.print("filtered self GPS coordinates \n");
+      Serial.print("filtered self GPS coordinates \n");
       //Convert string arrays to strings, then character arrays
       latfinal = nmea[2];
       Hlatfinal = nmea[3];
@@ -77,20 +77,13 @@ void loop() {
       Hlatfinal.toCharArray(tx_Hlat,20);
       lonfinal.toCharArray(tx_lon,20);
       Hlonfinal.toCharArray(tx_Hlon,20);
-      
-      //Print final GPS values with labels
-//      for (int i = 2; i < 6; i++) {
-//        Serial.print(labels[i]);
-//        Serial.print(nmea[i]);
-//        Serial.println("");
-//      }
     }
     else failedUpdates++;
     
     // Reset values and jump out of GPS while loop
     stringplace = 0;
     pos = 0;
-    
+    Serial.println("Trakker Listen");
     Trakker.listen(); //Priority set to trakker clips
     
   }
@@ -98,43 +91,56 @@ void loop() {
       
  // Serial.println("JO");
   //Begin reading Trakker clips
-  for (int j = 0; j < 1; j++)
+  for (int j = 0; j <= 3; j++)
   {
     if (j == 0)
     {
      Trakker.write("Tx1\n");
-    // Serial.println("sending code");
-    delay(1000);
+    Serial.println("Call Trakker 1");
     }
     else if (j == 1)
     {
-     Trakker.write("Tx2\n"); 
+     Trakker.write("Tx2\n");
+     Serial.println("Call Trakker 2");
     }
-    else { Trakker.write("Tx3\n");
+    else { 
+    Trakker.write("Tx3\n");
+    Serial.println("Call Trakker 3");
+    j = -1;
     }
-    delay (100);
+//    delay (100);
     ////Serial.print("Iteration: ");
-  while (Trakker.available())
+  while(!Trakker.available())
   {
-    String rx_init = Trakker.readStringUntil('\n');
-    Serial.print("rx_init: ");
-    Serial.println(rx_init);
-    String T_Longitude = rx_init.substring(0,rx_init.indexOf(",")); //prints longitude substring
+    
+  }
+//  while (Trakker.available())
+//  {
+//    Serial.println(Trakker.read());
+//  }
+//  if (done == true);
+//  {
+    while(Trakker.available())
+    {
+    Serial.flush();
+    String rx_in = Trakker.readString();
+    Serial.print("rx_in: ");
+    Serial.flush();
+    Serial.println(rx_in);
+    Serial.flush();
+    String T_Longitude = rx_in.substring(0,rx_in.indexOf(",")); //prints longitude substring
+    Serial.print("Logitude pulled: ");
+    Serial.println(T_Longitude);
     T_LonInt = T_Longitude.toFloat();
     int del1 = T_Longitude.length();
-    String T_Latitude = rx_init.substring(rx_init.indexOf(",",del1 + 2) + 1,rx_init.length() - 2); //prints longitude substring //might  have to be -4 at the end for \n attatched
+    String T_Latitude = rx_in.substring(rx_in.indexOf(",") + 1,rx_in.length()); //prints longitude substring //might  have to be -4 at the end for \n attatched
+    Serial.print("Latitude pulled: ");
+    Serial.println(T_Latitude);
     T_LatInt = T_Latitude.toFloat();
-    //Serial.println(T_LonInt,8);
-    //Serial.println(T_LatInt,8);
-     //normalized coordinate system. 
-     // 1m / 0.00001 degree change
      
      //Example Coordinates
      B_LonInt = 39.190953;
      B_LatInt = -096.584159;
-     //Serial.println(abs(B_LonInt),8);
-//     Serial.println(B_LonInt,8);
-//     Serial.println(B_LatInt,8);
 
      //find magnitude of distance between tracker and backpack
      DeltaLon = abs(B_LonInt) - abs(T_LonInt);
@@ -174,15 +180,15 @@ void loop() {
       {
       //Third Quadrant 
       // both negative
-     DeltaLon1 = -1 * 100000 * abs(DeltaLon);       <--------
-     DeltaLat1 = -1 * 100000 * abs(DeltaLat);       <--------
+     DeltaLon1 = -1 * 100000 * abs(DeltaLon);    //   <--------
+     DeltaLat1 = -1 * 100000 * abs(DeltaLat);    //   <--------
       }
   }
   //   Serial.println(DeltaLat1);
 //Serial.println(DeltaLon1);
      ratio = (DeltaLon1)/(DeltaLat1);
-    // Serial.println(ratio);
-     degree = (180 * atan(ratio))/3.14159265359;     <--------
+    // Serial.println(ratio); 
+    degree = (180 * atan(ratio))/3.14159265359;  //   <--------
   //  Serial.println(degree);  
   }
   //Serial.println("Left while");
