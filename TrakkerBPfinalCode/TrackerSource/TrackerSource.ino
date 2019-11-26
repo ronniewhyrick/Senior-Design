@@ -1,15 +1,17 @@
 #include <SoftwareSerial.h>
-SoftwareSerial GPSModule(5, 6); // RX, TX
-SoftwareSerial HC12(9, 10); // HC-12 TX Pin, HC-12 RX Pin
+SoftwareSerial GPSModule(11, 10); // RX, TX
+SoftwareSerial HC12(6, 5); // HC-12 TX Pin, HC-12 RX Pin
 int updates;
 int failedUpdates;
 int pos;
 int stringplace = 0;
 bool txdata = false;
+bool enter1 = true;
 char tx_lat[20];
 char tx_lon[20];
 char tx_Hlat[20];
 char tx_Hlon[20];
+char tx_coordinates[25];
 String timeUp;
 String nmea[15];
 String latfinal;
@@ -17,13 +19,14 @@ String lonfinal;
 String Hlatfinal;
 String Hlonfinal;
 String labels[12] {"Time: ", "Status: ", "Latitude: ", "Hemisphere: ", "Longitude: ", "Hemisphere: ", "Speed: ", "Track Angle: ", "Date: "};
-
+String txinput;
+int m = 1;
 void setup() {
   Serial.begin(9600);
   GPSModule.begin(9600);
   HC12.begin(9600);   
   Serial.println("Setup Complete");
-  HC12.write("Hello");
+  //HC12.write("Hello");
 }
 
 void loop() {
@@ -36,6 +39,7 @@ void loop() {
     GPSModule.read();
   }
   if (GPSModule.find("$GPRMC,")) {
+    Serial.println("Grabbing GPS data");
     String tempMsg = GPSModule.readStringUntil('\n');
     for (int i = 0; i < tempMsg.length(); i++) {
       if (tempMsg.substring(i, i + 1) == ",") {
@@ -48,42 +52,52 @@ void loop() {
       }
     }
     updates++;
-    HC12.listen();
     nmea[2] = ConvertLat();
     nmea[4] = ConvertLng();
-    latfinal = nmea[2];
-    Hlatfinal = nmea[3];
-    lonfinal = nmea[4];
-    Hlonfinal = nmea[5]; 
-    latfinal.toCharArray(tx_lat,20);
-    Hlatfinal.toCharArray(tx_Hlat,20);
-    lonfinal.toCharArray(tx_lon,20);
-    Hlonfinal.toCharArray(tx_Hlon,20);
-    
-    for (int i = 2; i < 6; i++) {
-      Serial.print(labels[i]);
-      Serial.print(nmea[i]);
-      Serial.println("");
+    HC12.listen();
+    delay(20);
+    while(!Serial.available())
+    {
+      if (m > 3)
+      {
+        m = 1;
+      }
+      if (enter1 == true)
+      {
+      delay(150);
+      Serial.print("Trakker ");
+      Serial.print(m);
+      Serial.println(" Called");
+      delay(50);
+      Serial.print("Enter The Coordinates of Trakker ");
+      Serial.println(m);
+      enter1 = false;
+      m++;
+      }
     }
-    HC12.write(tx_lat);
-    HC12.write(",");
-    HC12.write(tx_Hlat);
-    HC12.write(",");
-    HC12.write(tx_lon);
-    HC12.write(",");
-    HC12.write(tx_Hlon);
-    HC12.write('\n');
-    delay(1000);
+    if (Serial.available())
+    {
+    txinput = Serial.readString();
+    }
+    Serial.flush();
+//    for (int i = 2; i < 6; i++) {
+//      Serial.print(labels[i]);
+//      Serial.print(nmea[i]);
+//      Serial.println("");
+//    }
+    //Serial.println(txinput);
+    txinput.toCharArray(tx_coordinates,25);
+    Serial.print("tx_coordinates: ");
+    Serial.println(tx_coordinates);
+    Serial.flush();
+    HC12.flush();
+    HC12.write(tx_coordinates);
+    enter1 = true;     
   }
   else failedUpdates++;
   stringplace = 0;
   pos = 0;
-  HC12.listen();
- while (1)
- {
-  HC12.write("Transmit gud");
-  delay(1000);
- }
+  GPSModule.listen();
 }
 
 String ConvertLat() {
