@@ -11,6 +11,8 @@ char tx_lat[20];
 char tx_lon[20];
 char tx_Hlat[20];
 char tx_Hlon[20];
+char rxcharlat[20];
+char rxcharlon[20];
 String timeUp;
 String nmea[15];
 String latfinal;
@@ -19,8 +21,11 @@ String Hlatfinal;
 String Hlonfinal;
 String labels[12] {"Time: ", "Status: ", "Latitude: ", "Hemisphere: ", "Longitude: ", "Hemisphere: ", "Speed: ", "Track Angle: ", "Date: "};
 //backpack unique variables
-char rx_in[50];
+String rx_lat;
+String rx_lon;
 bool done = false; // Listen check complete (0 = false, 1 = true)
+bool rxd = false;
+bool rxlat = false;
 void setup() {
   Serial.begin(9600);
   //initialize software serial for GPS then Trakker
@@ -42,10 +47,10 @@ void loop() {
   double ratio;
   double degree;
   //Begin reading GPS module
-  delay(500);
+  delay (1000);
   while ((GPSModule.available()))
   {
-   // Serial.println("entered gps");
+   Serial.println("entered gps");
     //Flush GPS buffer and begin reading data
     GPSModule.flush();
     GPSModule.read();
@@ -93,20 +98,48 @@ void loop() {
   //Begin reading Trakker clips
   for (int j = 0; j <= 3; j++)
   {
-    if (j == 0)
+    while (j == 0 && rxd == false)
     {
-     Trakker.write("Tx1\n");
+     Trakker.write("Tx1");
     Serial.println("Call Trakker 1");
-    }
-    else if (j == 1)
+    Serial.flush();
+    delay(2000);
+    if (Trakker.available())
     {
-     Trakker.write("Tx2\n");
-     Serial.println("Call Trakker 2");
+     Trakker.readString();
+     Serial.println("Trakker 1 Link - Good");
+     Serial.flush();
+     rxd = true;
     }
-    else { 
-    Trakker.write("Tx3\n");
+    }
+    while (j == 1 && rxd == false)
+    {
+     Trakker.write("Tx2");
+     Serial.println("Call Trakker 2");
+     Serial.flush();
+     delay(2000);
+     if (Trakker.available())
+      {
+       Trakker.readString();
+       Serial.println("Trakker 2 Responded back");
+       Serial.flush();
+       rxd = true;
+      }
+    }
+    while (j = 2 && rxd == false)
+    { 
+    Trakker.write("Tx3");
     Serial.println("Call Trakker 3");
-    j = -1;
+    Serial.flush();
+    delay(2000);
+    if (Trakker.available())
+    {
+     Trakker.readString();
+     Serial.println("Trakker 3 Responded back");
+     Serial.flush();
+     rxd = true;
+     j = -1;
+    }
     }
 //    delay (100);
     ////Serial.print("Iteration: ");
@@ -114,29 +147,39 @@ void loop() {
   {
     
   }
-//  while (Trakker.available())
-//  {
-//    Serial.println(Trakker.read());
-//  }
-//  if (done == true);
-//  {
+
     while(Trakker.available())
     {
-    Serial.flush();
-    String rx_in = Trakker.readString();
-    Serial.print("rx_in: ");
-    Serial.flush();
-    Serial.println(rx_in);
-    Serial.flush();
-    String T_Longitude = rx_in.substring(0,rx_in.indexOf(",")); //prints longitude substring
-    Serial.print("Logitude pulled: ");
-    Serial.println(T_Longitude);
-    T_LonInt = T_Longitude.toFloat();
-    int del1 = T_Longitude.length();
-    String T_Latitude = rx_in.substring(rx_in.indexOf(",") + 1,rx_in.length()); //prints longitude substring //might  have to be -4 at the end for \n attatched
-    Serial.print("Latitude pulled: ");
-    Serial.println(T_Latitude);
-    T_LatInt = T_Latitude.toFloat();
+    rx_lat = Trakker.readString();
+    Trakker.flush();
+    Trakker.write("Lat Good");
+    Serial.println("rx_in: ");
+    while (!Trakker.available())
+    {
+      delay(10);
+    }
+    if (Trakker.available())
+    {
+    rx_lon = Trakker.readString();  
+    }
+    Serial.print(rx_lon);
+    Serial.print(rx_lat);
+//    Serial.flush();
+//    delay(100);
+//    Serial.println(rx_in);
+//    Serial.flush();
+//    String T_Longitude = rx_in.substring(0,rx_in.indexOf(",")); //prints longitude substring
+//    Serial.println("Logitude pulled: ");
+//    Serial.flush();
+//    Serial.println(T_Longitude);
+    T_LonInt = rx_lon.toFloat();
+//    int del1 = T_Longitude.length();
+//    String T_Latitude = rx_in.substring(rx_in.indexOf(",") + 1,rx_in.length()); //prints longitude substring //might  have to be -4 at the end for \n attatched
+//    Serial.println("Latitude pulled: ");
+//    Serial.flush();
+//    Serial.println(T_Latitude);
+    T_LatInt = rx_lat.toFloat();
+    Serial.print(T_LatInt,8);
      
      //Example Coordinates
      B_LonInt = 39.190953;
@@ -144,9 +187,9 @@ void loop() {
 
      //find magnitude of distance between tracker and backpack
      DeltaLon = abs(B_LonInt) - abs(T_LonInt);
-   //  Serial.println(DeltaLon,8);
+     Serial.println(DeltaLon,8);
      DeltaLat = abs(B_LatInt) - abs(T_LatInt);
-   //  Serial.println(DeltaLat,8);
+     Serial.println(DeltaLat,8);
      distance = sqrt((DeltaLat*DeltaLat) + (DeltaLon*DeltaLon));
     // Serial.print("Distance is: ");
    //  Serial.println(distance,8);
@@ -191,6 +234,7 @@ void loop() {
     degree = (180 * atan(ratio))/3.14159265359;  //   <--------
   //  Serial.println(degree);  
   }
+  rxd = false;
   //Serial.println("Left while");
   }
   //Serial.println("Left For");
