@@ -5,13 +5,13 @@ int updates;
 int failedUpdates;
 int pos;
 int stringplace = 0;
-bool txdata = false;
+bool found = false;
 bool enter1 = true;
 char tx_lat[20];
 char tx_lon[20];
 char tx_Hlat[20];
 char tx_Hlon[20];
-char tx_coordinates[25];
+//char tx_coordinates[25];
 String timeUp;
 String nmea[15];
 String latfinal;
@@ -20,7 +20,8 @@ String Hlatfinal;
 String Hlonfinal;
 String labels[12] {"Time: ", "Status: ", "Latitude: ", "Hemisphere: ", "Longitude: ", "Hemisphere: ", "Speed: ", "Track Angle: ", "Date: "};
 String txinput;
-int m = 1;
+String bpCallID;
+int m = 0;
 void setup() {
   Serial.begin(9600);
   GPSModule.begin(9600);
@@ -30,7 +31,7 @@ void setup() {
 }
 
 void loop() {
-  Serial.flush();
+  //Serial.flush();
   GPSModule.listen();
   GPSModule.flush();
   while (GPSModule.available() > 0)
@@ -52,47 +53,80 @@ void loop() {
       }
     }
     updates++;
+    Serial.println("HC12 Listening");
     nmea[2] = ConvertLat();
     nmea[4] = ConvertLng();
     HC12.listen();
-    delay(20);
+    //delay(20);
+    while(!HC12.available() && found == false)
+    {
+      
+    }
+    //Serial.flush();
+    while(HC12.available())
+    {
+       found = true;
+       bpCallID = HC12.readString();
+       Serial.println(bpCallID);
+       Serial.flush();
+       HC12.write("Rxd");
+     if (bpCallID == "Tx1")
+     {
+      // Serial.flush();
+       Serial.println("Trakker 1 Rxd Call");
+       //Serial.flush();
+       Serial.println("Enter Trakker 1 Coordinates");
+      //39.19097,-96.58421
+      // Serial.flush();
     while(!Serial.available())
     {
-      if (m > 3)
-      {
-        m = 1;
-      }
-      if (enter1 == true)
-      {
-      delay(150);
-      Serial.print("Trakker ");
-      Serial.print(m);
-      Serial.println(" Called");
-      delay(50);
-      Serial.print("Enter The Coordinates of Trakker ");
-      Serial.println(m);
-      enter1 = false;
-      m++;
-      }
+      
     }
     if (Serial.available())
     {
     txinput = Serial.readString();
     }
+    Serial.println(txinput);
     Serial.flush();
+    String T_Longitude = txinput.substring(0,txinput.indexOf(",")); //prints longitude substring
+    String T_Latitude = txinput.substring(txinput.indexOf(",") + 1,txinput.length()); //prints longitude substring //might  have to be -4 at the end for \n attatched
+    int LenLon = T_Longitude.length();
+    int LenLat = T_Latitude.length();
+    Serial.println(T_Longitude);
+    Serial.println(T_Latitude);
 //    for (int i = 2; i < 6; i++) {
 //      Serial.print(labels[i]);
 //      Serial.print(nmea[i]);
 //      Serial.println("");
 //    }
     //Serial.println(txinput);
-    txinput.toCharArray(tx_coordinates,25);
+    char txlon[LenLon];
+    char txlat[LenLat];
+    T_Longitude.toCharArray(txlon,LenLon);
+    T_Latitude.toCharArray(txlat,LenLat);
+    Serial.println(txlon);
+    Serial.println(txlat);
     Serial.print("tx_coordinates: ");
-    Serial.println(tx_coordinates);
+    Serial.println(txlon);
     Serial.flush();
+    HC12.write(txlon);
     HC12.flush();
-    HC12.write(tx_coordinates);
-    enter1 = true;     
+    while (!HC12.available())
+    {
+      
+    }
+    while (HC12.available())
+    {
+      String Latgood = HC12.readString();
+      if (Latgood == "Lat Good");
+      {
+        HC12.write(txlat); 
+      }
+    }
+    enter1 = true; 
+    found = false; 
+     }
+    }
   }
   else failedUpdates++;
   stringplace = 0;
