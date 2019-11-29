@@ -120,7 +120,8 @@ void loop() {
       String Latgood = HC12.readString();
       if (Latgood == "Lat Good");
       {
-        HC12.write(txlat); 
+        Serial.println(txlat);
+        HC12.write(txlat);
       }
     }
     enter1 = true; 
