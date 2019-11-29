@@ -1,4 +1,6 @@
 #include <SoftwareSerial.h>
+#include <math.h>
+#define pi 3.14159265358979323846
 #define abs(x) ((x)>0?(x):-(x))
 //establish two software serial ports
 SoftwareSerial GPSModule(5, 6); // RX, TX
@@ -19,6 +21,7 @@ String latfinal;
 String lonfinal;
 String Hlatfinal;
 String Hlonfinal;
+float theta,dps,phi,phim;
 String labels[12] {"Time: ", "Status: ", "Latitude: ", "Hemisphere: ", "Longitude: ", "Hemisphere: ", "Speed: ", "Track Angle: ", "Date: "};
 //backpack unique variables
 String rx_lat;
@@ -26,15 +29,24 @@ String rx_lon;
 bool done = false; // Listen check complete (0 = false, 1 = true)
 bool rxd = false;
 bool rxlat = false;
+double latT;
+double lonT;
+double latB;
+double lonB;
+
+float deg2rad(float);
+float rad2deg(float);
+
+  
 void setup() {
   Serial.begin(9600);
-  //initialize software serial for GPS then Trakker
   Trakker.begin(9600);
   GPSModule.begin(9600);
- // Serial.println("Setup Complete");
 }
 void loop() {     
   Serial.flush();
+  int lonlen;
+  int latlen;
   float T_LonInt;
   float T_LatInt;
   float B_LonInt;
@@ -43,9 +55,11 @@ void loop() {
   float DeltaLat;
   double DeltaLon1;
   double DeltaLat1;
-  float distance;
+  float distancetx;
   double ratio;
-  double degree;
+  double degreetx;
+
+
   //Begin reading GPS module
   delay (1000);
   while ((GPSModule.available()))
@@ -141,8 +155,6 @@ void loop() {
      j = -1;
     }
     }
-//    delay (100);
-    ////Serial.print("Iteration: ");
   while(!Trakker.available())
   {
     
@@ -151,6 +163,7 @@ void loop() {
     while(Trakker.available())
     {
     rx_lat = Trakker.readString();
+    latlen = rx_lat.length();
     Trakker.flush();
     Trakker.write("Lat Good");
     Serial.println("rx_in: ");
@@ -160,59 +173,43 @@ void loop() {
     }
     if (Trakker.available())
     {
-    rx_lon = Trakker.readString();  
+    rx_lon = Trakker.readString();
+    lonlen = rx_lon.length(); 
     }
-    Serial.print(rx_lon);
-    Serial.print(rx_lat);
-//    Serial.flush();
-//    delay(100);
-//    Serial.println(rx_in);
-//    Serial.flush();
-//    String T_Longitude = rx_in.substring(0,rx_in.indexOf(",")); //prints longitude substring
-//    Serial.println("Logitude pulled: ");
-//    Serial.flush();
-//    Serial.println(T_Longitude);
+    Serial.println(rx_lon);
+    Serial.flush();
+    Serial.println(rx_lat);
+    Serial.flush();
     T_LonInt = rx_lon.toFloat();
-//    int del1 = T_Longitude.length();
-//    String T_Latitude = rx_in.substring(rx_in.indexOf(",") + 1,rx_in.length()); //prints longitude substring //might  have to be -4 at the end for \n attatched
-//    Serial.println("Latitude pulled: ");
-//    Serial.flush();
-//    Serial.println(T_Latitude);
+    Serial.println(T_LonInt,5);
     T_LatInt = rx_lat.toFloat();
-    Serial.print(T_LatInt,8);
+    Serial.print("Lat as Float");
+    Serial.println(T_LatInt,5);
      
      //Example Coordinates
-     B_LonInt = 39.190953;
-     B_LatInt = -096.584159;
-
+     B_LonInt = -096.584159;
+     B_LatInt = 39.190953;
      //find magnitude of distance between tracker and backpack
      DeltaLon = abs(B_LonInt) - abs(T_LonInt);
-     Serial.println(DeltaLon,8);
      DeltaLat = abs(B_LatInt) - abs(T_LatInt);
-     Serial.println(DeltaLat,8);
-     distance = sqrt((DeltaLat*DeltaLat) + (DeltaLon*DeltaLon));
-    // Serial.print("Distance is: ");
-   //  Serial.println(distance,8);
-    //GPSModule.listen(); // Priority set to GPS
-    //Degree finder
-    if (T_LonInt > B_LonInt) // Tracker is North of Backpack
+    if (T_LonInt > B_LonInt) // Tracker is east of Backpack
     {
-      if (T_LatInt > B_LatInt) //Tracker is North-East of Backpack
+      if (T_LatInt > B_LatInt) //Tracker is North-east of Backpack
       {
        //First Quadrant
        // x & y are positive
      DeltaLon1 =  100000 * abs(DeltaLon);
      DeltaLat1 =  100000 * abs(DeltaLat);
       }
-      else //Tracker is North-West of Backpack
+      else //Tracker is south-East of Backpack
       {
      DeltaLon1 = 100000 * abs(DeltaLon);
      DeltaLat1 = -1 * 100000 * abs(DeltaLat);
       }
     }
-    else //Tracker is South of Backpack
+    else //Tracker is west of Backpack
     {
-      if (T_LatInt > B_LatInt) //Tracker is South-East of Backpack
+      if (T_LatInt > B_LatInt) //Tracker is North-west of Backpack
       {
       //Fourth Quadrant
       //x positive, y negative
@@ -231,8 +228,13 @@ void loop() {
 //Serial.println(DeltaLon1);
      ratio = (DeltaLon1)/(DeltaLat1);
     // Serial.println(ratio); 
-    degree = (180 * atan(ratio))/3.14159265359;  //   <--------
-  //  Serial.println(degree);  
+    degreetx = (180 * atan(ratio))/3.14159265359;  //   <--------
+  //  Serial.println(degree); 
+    distancetx = distance(B_LatInt,B_LonInt,T_LatInt,T_LonInt);
+    Serial.print("distance in Kilometers : ");
+    Serial.println(distancetx);
+    Serial.print("angle from 0 : ");
+    Serial.println(degreetx);
   }
   rxd = false;
   //Serial.println("Left while");
@@ -290,4 +292,41 @@ String ConvertLng() {
   lngfirst += CalcLng.substring(1);
   lngfirst = posneg += lngfirst;
   return lngfirst;
+}
+
+float distance(float lat1, float lon1, float lat2, float lon2) {
+  float dist;
+  
+  if ((lat1 == lat2) && (lon1 == lon2)) {
+    Serial.println("BAD");
+    return 0;
+  }
+  else {
+    theta = abs(abs(lon1) - abs(lon2));
+    phi = abs(abs(lat1) - abs(lat2));
+    phim = (abs(lat1) + abs(lat2)) / 2;
+    theta = deg2rad(theta);
+    phi = deg2rad(phi);
+    phim = deg2rad(phim);
+    float theta2 = theta * theta;
+    float phi2 = phi * phi;
+    dist = 6371.009  * sqrtf(phi2 + cosf(phim)*theta2);
+
+    return (dist);
+  }
+}
+/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+/*::  This function converts decimal degrees to radians             :*/
+/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+float deg2rad(float deg) {
+  float angle1 = deg * pi / 180;
+  return (angle1);
+  
+}
+
+/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+/*::  This function converts radians to decimal degrees             :*/
+/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+float rad2deg(float rad) {
+  return (rad * 180 / pi);
 }
