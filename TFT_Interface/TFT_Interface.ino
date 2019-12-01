@@ -60,7 +60,7 @@ String bLatS, bLonS;
 String tLatS, tLonS;
 String userLoc, trakLoc, lastLoc;
 String ratio, degree;
-double x, y;
+double x, y, j;
 double xLast, yLast;
 
 void setup(void) {
@@ -77,7 +77,7 @@ void loop() {
   while(Backpack.available()){
     userLoc = Backpack.readString();
     updateCoordinates(userLoc); //Update user's coordinate position
-    updateTrakkers(x, y);
+    updateTrakkers(x, y, j);
 //    Serial.print("userLoc: ");
 //    Serial.println(userLoc);
 //    Serial.print("trakLoc: ");
@@ -164,16 +164,37 @@ String updateCoordinates(String userLoc){
   Serial.print("curLoc: ");
   Serial.println(userLoc);
   lastLoc = userLoc;
-  Serial.print("lastLoc: ");
-  Serial.println(lastLoc);
+  //Serial.print("lastLoc: ");
+  //Serial.println(lastLoc);
   return lastLoc;
 }
 
-void updateTrakkers(double x, double y){
-  tft.fillCircle(xLast,yLast,3,ST77XX_BLACK);
-  tft.fillCircle(x,y,3,ST77XX_RED);
-  xLast = x;
-  yLast = y;
+void updateTrakkers(double x, double y, int trakkerNum){
+  if(trakkerNum == 0){
+    Serial.print("Trakker ");
+    Serial.print(trakkerNum);
+    Serial.print(" loc: ");
+    Serial.print(x);
+    Serial.print(", ");
+    Serial.println(y);
+    tft.fillCircle(xLast,yLast,3,ST77XX_BLACK);
+    tft.fillCircle(x,y,3,ST77XX_RED);
+    xLast = x;
+    yLast = y;
+  }
+  else if(trakkerNum == 1){
+    tft.fillCircle(xLast,yLast,3,ST77XX_BLACK);
+    tft.fillCircle(x,y,3,ST77XX_BLUE);
+    xLast = x;
+    yLast = y;
+  }
+  else {
+    tft.fillCircle(xLast,yLast,3,ST77XX_BLACK);
+    tft.fillCircle(x,y,3,ST77XX_YELLOW);
+    xLast = x;
+    yLast = y;
+  }
+
   //tft.fillCircle(170,312,3,ST77XX_BLUE);
   //tft.fillCircle(182,312,3,ST77XX_YELLOW);
 }

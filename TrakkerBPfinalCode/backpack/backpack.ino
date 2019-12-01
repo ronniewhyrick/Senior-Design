@@ -91,6 +91,7 @@ void loop() {
     while (j == 0 && rxd == false)
     {
       Trakker.write("Tx1");
+      lcd.write(j);
       Serial.println("Trakker1 - Calling");
       Serial.flush();
       delay(2000);
