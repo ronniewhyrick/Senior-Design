@@ -207,7 +207,6 @@ void loop() {
     Serial.println(tx);
     Serial.println(xtx);
     Serial.println(ytx);
-    lcd.listen();
     lcd.write(txfinal);
 
    // lcd.write(ytx);

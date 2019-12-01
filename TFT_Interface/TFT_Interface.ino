@@ -59,9 +59,9 @@ float tLon = 39.18823;
 String bLatS, bLonS;
 String tLatS, tLonS;
 String userLoc, trakLoc, lastLoc;
-String ratio, degree;
-double x, y, j;
+float angle, mag;
 double xLast, yLast;
+int trakNum;
 
 void setup(void) {
   tft.init(240, 320);           
@@ -77,7 +77,9 @@ void loop() {
   while(Backpack.available()){
     userLoc = Backpack.readString();
     updateCoordinates(userLoc); //Update user's coordinate position
-    updateTrakkers(x, y, j);
+    trakNum = Backpack.readString();
+    trakLoc = Backpack.readString();
+    updateTrakkers(trakNum, trakLoc); //Gather and print trakker's coordinate positions
 //    Serial.print("userLoc: ");
 //    Serial.println(userLoc);
 //    Serial.print("trakLoc: ");
@@ -169,33 +171,60 @@ String updateCoordinates(String userLoc){
   return lastLoc;
 }
 
-void updateTrakkers(double x, double y, int trakkerNum){
-  if(trakkerNum == 0){
-    Serial.print("Trakker ");
-    Serial.print(trakkerNum);
-    Serial.print(" loc: ");
-    Serial.print(x);
-    Serial.print(", ");
-    Serial.println(y);
-    tft.fillCircle(xLast,yLast,3,ST77XX_BLACK);
-    tft.fillCircle(x,y,3,ST77XX_RED);
-    xLast = x;
-    yLast = y;
-  }
-  else if(trakkerNum == 1){
-    tft.fillCircle(xLast,yLast,3,ST77XX_BLACK);
-    tft.fillCircle(x,y,3,ST77XX_BLUE);
-    xLast = x;
-    yLast = y;
-  }
-  else {
-    tft.fillCircle(xLast,yLast,3,ST77XX_BLACK);
-    tft.fillCircle(x,y,3,ST77XX_YELLOW);
-    xLast = x;
-    yLast = y;
+void updateTrakkers(int trakNum, String trakLoc){
+  uint16_t color = ST77XX_BLACK;
+  tft.fillCircle(xLast,yLast,3,color);
+
+  // Sets pixel color based on trakker number
+  switch (trakNum) {
+    case 0:
+      color = ST77XX_RED;
+      break;
+    case 1:
+      color = ST77XX_BLUE;
+      break;
+    case 2:
+      color = ST77XX_YELLOW;
+      break;
+    default:
+      color = ST77XX_BLACK;
+      break;
   }
 
-  //tft.fillCircle(170,312,3,ST77XX_BLUE);
-  //tft.fillCircle(182,312,3,ST77XX_YELLOW);
+  int delimLoc = trakLoc.indexOf(',');
+  if(delimLoc >= 0){
+      angle = (float)trakLoc.substring(0,delimLoc);
+      mag = (float)trakLoc.substring(delimLoc + 1);
+  }
+
+  // If angle of trakker is positive
+  if(angle > 0){
+    // Quadrant 1
+    if(angle < 90){ 
+      
+    }
+    // Quadrant 2
+    else{
+      
+    }
+  }
+  // If angle of trakker is negative
+  else{
+    // Quadrant 4
+    if(angle < 90){ 
+      
+    }
+    // Quadrant 3
+    else{
+      
+    }
+  }
+  xLast = x;
+  yLast = y;
+
+//    Serial.print("Trakker ");
+//    Serial.print(trakkerNum);
+//    Serial.print(" loc: ");
+//    Serial.println(trakLoc);
 }
 
