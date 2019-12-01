@@ -48,7 +48,7 @@
 
 // For the ST7789-based displays, we will use this call
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
-SoftwareSerial Backpack(6,5);
+SoftwareSerial Backpack(3,2);
 
 const float xLat = -096.584159;
 const float xLon =  39.190953;
@@ -59,43 +59,30 @@ float tLon = 39.18823;
 String bLatS, bLonS;
 String tLatS, tLonS;
 String userLoc, trakLoc, lastLoc;
-int x = 128;
-int y = 170;
-int xLast, yLast;
-int i = 0;
+String ratio, degree;
+double x, y;
+double xLast, yLast;
 
 void setup(void) {
   tft.init(240, 320);           
   tft.fillScreen(ST77XX_BLACK);
-  Backpack.begin(9600);
   Serial.begin(9600);
+  Backpack.begin(9600);
   
   startupScreen();
   printMap();
 }
 
 void loop() {
-  while(i < 5){
-      bLat -= 0.00002;
-      bLon += 0.00001;
-      tLat += 0.00002;
-      tLon -= 0.00001;
-      bLatS = String(bLat,5);
-      bLonS = String(bLon,5);
-      tLatS = String(tLat,5);
-      tLonS = String(tLon,5);
-      userLoc = bLonS + "N, " + bLatS + "W";
-      trakLoc = tLonS + "N, " + tLatS + "W";
-      Serial.print("userLoc: ");
-      Serial.println(userLoc);
-      Serial.print("trakLoc: ");
-      Serial.println(trakLoc);
-      updateCoordinates(userLoc); //Update user's coordinate position
-      updateTrakkers(x, y);
-      x += 14;
-      y += 14;
-      i++;
-      delay(2500);
+  while(Backpack.available()){
+    userLoc = Backpack.readString();
+    updateCoordinates(userLoc); //Update user's coordinate position
+    updateTrakkers(x, y);
+//    Serial.print("userLoc: ");
+//    Serial.println(userLoc);
+//    Serial.print("trakLoc: ");
+//    Serial.println(trakLoc);
+    delay(2500);
   }
 }
 
@@ -155,11 +142,6 @@ void printMap(){
   tft.setCursor(114, 170);
   tft.println("X");
 
-//  tft.setCursor(158, 312);
-//  tft.setTextColor(ST77XX_RED);
-//  tft.setFont(&FreeSansBold9pt7b);
-//  tft.println("< V > ^");
-
   // Print available trakker prompt
   tft.setTextColor(ST77XX_GREEN);
   tft.setFont(&FreeMono9pt7b);
@@ -174,63 +156,20 @@ void printMap(){
 
 String updateCoordinates(String userLoc){
   tft.setCursor(0,41);
-  //tft.setFont(&FreeMonoBold9pt7b);
   tft.setTextColor(ST77XX_BLACK);
   tft.println(lastLoc); //replace with coordinates variable
   tft.setCursor(0,41);
   tft.setTextColor(ST77XX_WHITE);
   tft.println(userLoc); //replace with coordinates variable
+  Serial.print("curLoc: ");
+  Serial.println(userLoc);
   lastLoc = userLoc;
-  //Serial.print("lastLoc: ");
-  //Serial.println(lastLoc);
+  Serial.print("lastLoc: ");
+  Serial.println(lastLoc);
   return lastLoc;
 }
 
-#define abs(x) ((x)>0?(x):-(x))
-//float deltaLatF, deltaLonF;
-//double deltaLatD, deltaLonD;
-//double ratio, degree;
-
-                               //Passing xLat and xLon
-//void updateTrakkers(const float xLat, const float xLon, float tLat, float tLon){
-//  float deltaLatF = abs(xLat) - abs(tLat);
-//  float deltaLonF = abs(xLon) - abs(tLon);
-//  float magnitude = sqrt((deltaLatF*deltaLatF) + (deltaLonF*deltaLonF));
-//  double deltaLatD, deltaLonD;
-//  
-//  if (tLon > xLon) { // Tracker is North of Backpack
-//    if (tLat > xLat) {//Tracker is North-East of Backpack
-//      //First Quadrant
-//      // x postive, y positive
-//      double deltaLatD =  100000 * abs(deltaLatF);
-//      double deltaLonD =  100000 * abs(deltaLonF);
-//    }
-//    else { //Tracker is North-West of Backpack
-//      //Second Quadrant
-//      //x negative, y postive
-//      deltaLatD = -1 * 100000 * abs(deltaLatF);
-//      deltaLonD = 100000 * abs(deltaLonF);
-//    }
-//  }
-//  else { //Tracker is South of Backpack
-//    if (tLat > xLat) { //Tracker is South-East of Backpack
-//      //Fourth Quadrant
-//      //x positive, y negative
-//      deltaLatD = 100000 * abs(deltaLatF);
-//      deltaLonD = -1 * 100000 * abs(deltaLonF);
-//    }
-//    else { //Tracker is South-West of Backpack
-//      //Third Quadrant 
-//      // x negative, y negative
-//      deltaLatD = -1 * 100000 * abs(deltaLatF);
-//      deltaLonD = -1 * 100000 * abs(deltaLonF);
-//    }
-//  }
-//  double ratio = (deltaLonD)/(deltaLatD);
-//  double degree = (180 * atan(ratio))/3.14159265359;
-
-
-void updateTrakkers(int x, int y){
+void updateTrakkers(double x, double y){
   tft.fillCircle(xLast,yLast,3,ST77XX_BLACK);
   tft.fillCircle(x,y,3,ST77XX_RED);
   xLast = x;

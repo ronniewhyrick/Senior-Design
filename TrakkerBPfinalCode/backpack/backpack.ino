@@ -70,6 +70,10 @@ void loop() {
       //Convert string arrays to strings, then character arrays
       nmea[2].toCharArray(tx_lat,20);
       nmea[4].toCharArray(tx_lon,20);
+      char temp[50];
+      strcpy(temp, ", ");
+      strcpy(temp, tx_lat);
+      lcd.write(temp);  // <------------Reading in backpack location and print as current location
     }
     else failedUpdates++;
     
@@ -79,7 +83,6 @@ void loop() {
     Serial.println("Self GPS Found");
     Serial.println("Trakker Enable");
     Trakker.listen(); //Priority set to trakker clips
-    
   }
 
 //Begin reading Trakker clips
@@ -87,54 +90,50 @@ void loop() {
   {
     while (j == 0 && rxd == false)
     {
-     Trakker.write("Tx1");
-    Serial.println("Trakker1 - Calling");
-    Serial.flush();
-    delay(2000);
-    if (Trakker.available())
-    {
-     Trakker.readString();
-     Serial.println("Trakker1 - Responded ");
-     Serial.flush();
-     rxd = true;
-    }
+      Trakker.write("Tx1");
+      Serial.println("Trakker1 - Calling");
+      Serial.flush();
+      delay(2000);
+      if (Trakker.available())
+      {
+         Trakker.readString();
+         Serial.println("Trakker1 - Responded ");
+         Serial.flush();
+         rxd = true;
+      }
     }
     while (j == 1 && rxd == false)
     {
-     Trakker.write("Tx2");
-     Serial.println("Trakker2 - Calling");
-     Serial.flush();
-     delay(2000);
-     if (Trakker.available())
-      {
-       Trakker.readString();
-       Serial.println("Trakker2 - Responded");
+       Trakker.write("Tx2");
+       Serial.println("Trakker2 - Calling");
        Serial.flush();
-       rxd = true;
-      }
+       delay(2000);
+       if (Trakker.available())
+        {
+           Trakker.readString();
+           Serial.println("Trakker2 - Responded");
+           Serial.flush();
+           rxd = true;
+        }
     }
     while (j = 2 && rxd == false)
     { 
-    Trakker.write("Tx3");
-    Serial.println("Trakker3 - Calling");
-    Serial.flush();
-    delay(2000);
-    if (Trakker.available())
-    {
-     Trakker.readString();
-     Serial.println("Trakker3 - Responded");
-     Serial.flush();
-     rxd = true;
-     j = -1;
+      Trakker.write("Tx3");
+      Serial.println("Trakker3 - Calling");
+      Serial.flush();
+      delay(2000);
+      if (Trakker.available())
+      {
+         Trakker.readString();
+         Serial.println("Trakker3 - Responded");
+         Serial.flush();
+         rxd = true;
+         j = -1;
+      }
     }
-    }
-  while(!Trakker.available())
+  while(!Trakker.available()){/* delay input read in*/}
+  while(Trakker.available())
   {
-    
-  }
-
-    while(Trakker.available())
-    {
     rx_lat = Trakker.readString();
     latlen = rx_lat.length();
     Trakker.flush();
@@ -145,8 +144,8 @@ void loop() {
     }
     if (Trakker.available())
     {
-    rx_lon = Trakker.readString();
-    lonlen = rx_lon.length(); 
+      rx_lon = Trakker.readString();
+      lonlen = rx_lon.length(); 
     }
     T_LonInt = rx_lon.toFloat();
     Serial.print("Trakker Longitude Rxd: ");
@@ -218,13 +217,7 @@ void loop() {
 
 }//end of void loop()
 
-
-
-
-
-
-
-
+///////////////////////////////////////////////////////////////
 
 String ConvertLat() {
   String posneg = "";
@@ -251,6 +244,7 @@ String ConvertLat() {
   latfirst = posneg += latfirst;
   return latfirst;
 }
+
 String ConvertLng() {
   String posneg = "";
   if (nmea[5] == "W") {
