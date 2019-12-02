@@ -70,10 +70,13 @@ void loop() {
       //Convert string arrays to strings, then character arrays
       nmea[2].toCharArray(tx_lat,20);
       nmea[4].toCharArray(tx_lon,20);
-      char temp[50];
-      strcpy(temp, ", ");
-      strcpy(temp, tx_lat);
-      lcd.write(temp);  // <------------Reading in backpack location and print as current location
+
+//      char temp[50];
+//      String temps = tx_lat + "," + tx_lon;
+//      temps.toCharArray(
+//      strcpy(temp, ", ");
+//      strcpy(temp, tx_lat);
+//      lcd.write(temp);  // <------------Reading in backpack location and print as current location
     }
     else failedUpdates++;
     
@@ -82,9 +85,8 @@ void loop() {
     pos = 0;
     Serial.println("Self GPS Found");
     Serial.println("Trakker Enable");
-    Trakker.listen(); //Priority set to trakker clips
+   Trakker.listen();
   }
-
 //Begin reading Trakker clips
   for (int j = 0; j <= 3; j++)
   {

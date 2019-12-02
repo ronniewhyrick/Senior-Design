@@ -27,7 +27,6 @@ void setup() {
 }
 
 void loop() {
-  //Serial.flush();
   GPSModule.listen();
   GPSModule.flush();
   while (GPSModule.available() > 0)
@@ -56,11 +55,12 @@ void loop() {
     //delay(20);
     while(!HC12.available() && found == false)
     {
-      
+    //Serial.println("HELLO");
     }
     //Serial.flush();
     while(HC12.available())
     {
+      Serial.println("HELLO");
        found = true;
        bpCallID = HC12.readString();
        Serial.println(bpCallID);

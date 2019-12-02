@@ -73,10 +73,10 @@ void loop() {
     trakNum = Backpack.readString().toInt();
     trakLoc = Backpack.readString();
     updateTrakkers(trakNum, trakLoc); // Gather and print trakker's coordinate positions
-//    Serial.print("userLoc: ");
-//    Serial.println(userLoc);
-//    Serial.print("trakLoc: ");
-//    Serial.println(trakLoc);
+    Serial.print(F("userLoc: "));
+    Serial.println(userLoc);
+    Serial.print(F("trakLoc: "));
+    Serial.println(trakLoc);
     delay(2500);
   }
 }
