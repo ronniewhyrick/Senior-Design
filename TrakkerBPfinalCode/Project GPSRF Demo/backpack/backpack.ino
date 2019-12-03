@@ -3,8 +3,8 @@
 #define pi 3.14159265358979323846
 #define abs(x) ((x)>0?(x):-(x))
 //establish two software serial ports
-SoftwareSerial GPSModule(5, 6); // RX, TX
-SoftwareSerial Trakker(9, 10); // HC-12 TX Pin, HC-12 RX Pin
+SoftwareSerial GPSModule(10, 9); // RX, TX
+SoftwareSerial Trakker(6, 5); // HC-12 TX Pin, HC-12 RX Pin
 SoftwareSerial lcd(11,3);
 
 int updates,failedUpdates,pos;
@@ -42,14 +42,14 @@ void loop() {
   float distancetx,angle;
   float xtx,ytx;
   //Begin reading GPS module
-  delay (1000);
+  delay (5000);
   while ((GPSModule.available()))
   {
-   Serial.println("entered gps");
+   //Serial.println("entered gps");
     //Flush GPS buffer and begin reading data
     GPSModule.flush();
     GPSModule.read();
-    
+  }
     //Begin taking in nmea coordinates
     if (GPSModule.find("$GPRMC,")) {
       Serial.println("Self GPS Finding");
@@ -88,7 +88,6 @@ void loop() {
     Serial.println("Self GPS Found");
     Serial.println("Trakker Enable");
    Trakker.listen();
-  }
 //Begin reading Trakker clips
   for (int j = 0; j < 4 ; j++)
   {
