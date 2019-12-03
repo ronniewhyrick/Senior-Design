@@ -71,11 +71,11 @@ void setup(void) {
   Serial.begin(9600);
   tft.setRotation(2);
   startupScreen();
-  printMap();
+  initializeMap();
 }
 
 void loop() {
-  while(i < 5){
+  while(i < 10){
       bLat -= 0.00002;
       bLon += 0.00001;
       tLat += 0.00002;
@@ -90,7 +90,7 @@ void loop() {
       Serial.println(userLoc);
       Serial.print("trakLoc: ");
       Serial.println(trakLoc);
-      printMap();
+      //printMap();
       updateCoordinates(userLoc); //Update user's coordinate position
       updateTrakkers(x, y);
       //x -= 14;
@@ -115,7 +115,7 @@ void startupScreen(){
 }
 
 // Initialize map and prompts on display
-void printMap(){
+void initializeMap(){
   tft.fillScreen(ST77XX_BLACK);
   tft.setTextColor(ST77XX_GREEN);
   tft.setFont(&FreeMono9pt7b);
@@ -194,8 +194,9 @@ String updateCoordinates(String userLoc){
 
 void updateTrakkers(int x, int y){
   int x2 = x - 85;
-  //tft.fillCircle(xLast,yLast,8,ST77XX_BLACK);
-  //tft.fillCircle(xLast2,yLast,8,ST77XX_BLACK);
+  tft.fillCircle(xLast,yLast,8,ST77XX_BLACK);
+  tft.fillCircle(xLast2,yLast,8,ST77XX_BLACK);
+  printMap();
   tft.fillCircle(x,y,8,ST77XX_RED);
   tft.fillCircle(x2,y,8,ST77XX_BLUE);
   xLast = x;
@@ -204,3 +205,26 @@ void updateTrakkers(int x, int y){
   //tft.fillCircle(170,312,3,ST77XX_BLUE);
   //tft.fillCircle(182,312,3,ST77XX_YELLOW);
 }
+
+void printMap(){
+  // Draws out sonar circles
+  for (int16_t i = 0; i <= 5; i++) {
+  //for (int16_t i = 0; i < 12; i++) {
+    //void drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
+      tft.drawCircle(120, 164, radius, ST77XX_GREEN);
+      radius = radius + 22;
+  }
+//  // Prints ring distance
+//  tft.setFont();
+//  tft.setTextColor(ST77XX_GREEN);
+//  tft.setCursor(106, 258);
+//  tft.println("3.0 m");
+
+  // Print user origin position on map
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setFont(&FreeSansBold9pt7b);
+  tft.setCursor(114, 176);
+  tft.setCursor(114, 170);
+  tft.println("X");
+}
+
