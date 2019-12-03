@@ -28,9 +28,9 @@
 // GND - GND
 // 13 - SCK (SPI clock)
 // 11 - MOSI (SPI MOSI)
-// 7* - CS (SPI Chip select)
-// 6* - RST (Display Reset)
-// 5* - D/C (SPI data/command select)
+// 8* - CS (SPI Chip select)
+// 7* - RST (Display Reset)
+// 4* - D/C (SPI data/command select)
 // *Can be changed to any pin
 
 #define TFT_CS         8
@@ -61,7 +61,7 @@ void setup(void) {
   tft.fillScreen(ST77XX_BLACK);
   Serial.begin(9600);
   Backpack.begin(9600);
-  
+  tft.setRotation(2);
   startupScreen();
   printMap();
 }
