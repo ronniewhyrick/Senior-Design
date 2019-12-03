@@ -49,10 +49,14 @@ void loop() {
     Serial.println("HC12 Listening");
 //    nmea[2] = ConvertLat();
 //    nmea[4] = ConvertLng();
+  }
+  Serial.print ("HC12Listen");
     HC12.listen();
-    while(!HC12.available() && found == false)
-    {
+    while(!HC12.available() && found == false){
+    
       //wait here till trakker call is received
+//      Serial.println("Trakker not called");
+//      delay(100);
       }
     while(HC12.available())
     {
@@ -116,8 +120,8 @@ void loop() {
     else { Serial.println("No Connection made");}
     found = false; 
     }
-  }
-  else failedUpdates++;
+  
+  //else failedUpdates++;
   stringplace = 0;
   pos = 0;
   GPSModule.listen();
