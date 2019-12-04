@@ -155,7 +155,7 @@ void initMap(){
 }
 
 void updateCoordinates(float bLat, float bLon){
-  userLoc = bLon + "N, " + bLat + "W";
+  userLoc = String(bLon,5) + "N, " + String(bLat,5) + "W";
   tft.setCursor(0,41);
   tft.setTextColor(ST77XX_BLACK);
   tft.println(lastLoc);

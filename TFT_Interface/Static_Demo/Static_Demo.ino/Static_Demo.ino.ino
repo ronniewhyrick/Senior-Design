@@ -50,8 +50,6 @@
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 SoftwareSerial Backpack(6,5);
 
-const double rLen = 0.02; // Radius of map in km
-const uint8_t pixCount = 110; // Amount of pixels within the radius
 const float xLat = -096.584159;
 const float xLon =  39.190953;
 float bLat = -096.58418;
@@ -63,7 +61,7 @@ String tLatS, tLonS;
 String userLoc, trakLoc, lastLoc;
 int x = 170;
 int y = 250;
-int x2, xLast, yLast, xLast2;
+int xLast, yLast, xLast2, x2;
 int i = 0;
 
 void setup(void) {
@@ -77,7 +75,7 @@ void setup(void) {
 }
 
 void loop() {
-  while(i < 20){
+  while(i < 12){
       bLat -= 0.00002;
       bLon += 0.00001;
       tLat += 0.00002;
@@ -88,21 +86,20 @@ void loop() {
       tLonS = String(tLon,5);
       userLoc = bLonS + "N, " + bLatS + "W";
       trakLoc = tLonS + "N, " + tLatS + "W";
+      Serial.print("userLoc: ");
+      Serial.println(userLoc);
+      Serial.print("trakLoc: ");
+      Serial.println(trakLoc);
+      //printMap();
       updateCoordinates(userLoc); //Update user's coordinate position
+      //updateTrakkers(x, y);
       x -= 4;
       x2 = x - 85;
       y -= 12;
       i++;
       updateTrakkers(x, y);
-      delay(4500);
+      //delay(4500);
   }
-  i = 0;
-  x = 170;
-  y = 250;
-  bLat = -096.58418;
-  bLon =  39.19096;
-  tLat = -096.58282;
-  tLon = 39.18823;
 }
 
 // Printout for the startup display
@@ -193,34 +190,30 @@ String updateCoordinates(String userLoc){
   return lastLoc;
 }
 
-void updateTrakkers(int x, int y){
-  int8_t xPlot = 211; // x coordinate
-  int8_t yPlot = 297; // y coordinate
-  int8_t inc = 12; // Cursor position increment size
+#define abs(x) ((x)>0?(x):-(x))
+//float deltaLatF, deltaLonF;
+//double deltaLatD, deltaLonD;
+//double ratio, degree;
 
+void updateTrakkers(int x, int y){
   tft.fillCircle(xLast,yLast,8,ST77XX_BLACK);
   tft.fillCircle(xLast2,yLast,8,ST77XX_BLACK);
   printMap();
-
-  if(x < rLen || y < rLen || x2 < rLen){
-     // Add to out of bounds label
-     xPlot += (inc*out);
-     tft.fillCircle(xPlot,yPlot,r,color);
-     out++;
-  }
-  else{
-    tft.fillCircle(x,y,8,ST77XX_RED);
-    tft.fillCircle(x2,y,8,ST77XX_BLUE);
-    xLast = x;
-    xLast2 = x2;
-    yLast = y;
-  }
+  tft.fillCircle(x,y,8,ST77XX_RED);
+  tft.fillCircle(x2,y,8,ST77XX_BLUE);
+  xLast = x;
+  xLast2 = x2;
+  yLast = y;
+  //tft.fillCircle(170,312,3,ST77XX_BLUE);
+  //tft.fillCircle(182,312,3,ST77XX_YELLOW);
 }
 
 void printMap(){
   uint16_t radius = 0;
   // Draws out sonar circles
   for (int16_t i = 0; i <= 5; i++) {
+  //for (int16_t i = 0; i < 12; i++) {
+    //void drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
       tft.drawCircle(120, 164, radius, ST77XX_GREEN);
       radius = radius + 22;
   }
