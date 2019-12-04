@@ -75,7 +75,7 @@ void setup(void) {
 }
 
 void loop() {
-  while(i < 12){
+  while(i < 7){
       bLat -= 0.00002;
       bLon += 0.00001;
       tLat += 0.00002;
@@ -98,7 +98,7 @@ void loop() {
       y -= 12;
       i++;
       updateTrakkers(x, y);
-      //delay(4500);
+      delay(4500);
   }
 }
 
@@ -196,14 +196,33 @@ String updateCoordinates(String userLoc){
 //double ratio, degree;
 
 void updateTrakkers(int x, int y){
-  tft.fillCircle(xLast,yLast,8,ST77XX_BLACK);
-  tft.fillCircle(xLast2,yLast,8,ST77XX_BLACK);
-  printMap();
-  tft.fillCircle(x,y,8,ST77XX_RED);
-  tft.fillCircle(x2,y,8,ST77XX_BLUE);
-  xLast = x;
-  xLast2 = x2;
-  yLast = y;
+  if(i < 12){
+    tft.fillCircle(xLast,yLast,8,ST77XX_BLACK);
+    tft.fillCircle(xLast2,yLast,8,ST77XX_BLACK);
+    printMap();
+    tft.fillCircle(x,y,8,ST77XX_RED);
+    tft.fillCircle(x2,y,8,ST77XX_BLUE);
+    xLast = x;
+    xLast2 = x2;
+    yLast = y;
+  }
+  else if(12 <= i < 14){
+    tft.fillCircle(xLast,yLast,8,ST77XX_BLACK);
+    tft.fillCircle(xLast2,yLast,8,ST77XX_BLACK);
+    printMap();
+    tft.fillCircle(x,y,8,ST77XX_RED);
+    tft.fillCircle(158,312,3,ST77XX_BLUE);
+    xLast = x;
+    xLast2 = x2;
+    yLast = y;
+  }
+//  }
+//  else if(14 <= i < 20){
+//    tft.fillCircle(xLast,yLast,8,ST77XX_BLACK);
+//    printMap();
+//    tft.fillCircle(168,312,3,ST77XX_RED);
+//  }
+
   //tft.fillCircle(170,312,3,ST77XX_BLUE);
   //tft.fillCircle(182,312,3,ST77XX_YELLOW);
 }
