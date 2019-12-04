@@ -59,9 +59,7 @@ float tLon = 39.18823;
 String bLatS, bLonS;
 String tLatS, tLonS;
 String userLoc, trakLoc, lastLoc;
-int x = 170;
-int y = 250;
-int xLast, yLast, xLast2, x2;
+int x, x2, y, xLast, yLast, xLast2;
 int i = 0;
 
 void setup(void) {
@@ -69,8 +67,8 @@ void setup(void) {
   tft.fillScreen(ST77XX_BLACK);
   Backpack.begin(9600);
   Serial.begin(9600);
-  tft.setRotation(2);
-  //startupScreen();
+  //tft.setRotation(2);
+  startupScreen();
   initializeMap();
 }
 
@@ -90,15 +88,15 @@ void loop() {
       Serial.println(userLoc);
       Serial.print("trakLoc: ");
       Serial.println(trakLoc);
-      //printMap();
       updateCoordinates(userLoc); //Update user's coordinate position
-      //updateTrakkers(x, y);
       x -= 4;
       x2 = x - 85;
       y -= 12;
-      i++;
+      xLast = x;
+      yLast = y;
+      xLast2 = xLast;
       updateTrakkers(x, y);
-      delay(4500);
+      //delay(4500);
   }
 }
 
@@ -113,7 +111,7 @@ void startupScreen(){
   tft.println("to");
   tft.setCursor(20, 200);
   tft.println("PalPack");
-  delay(1000);
+  //delay(1000);
 }
 
 // Initialize map and prompts on display
@@ -135,13 +133,9 @@ void initializeMap(){
   //tft.setFont(&FreeMonoBold9pt7b);
   tft.setCursor(155,11);
   tft.println("ON"); //replace with status variable
-  //tft.setCursor(0,41);
-  //tft.println("-96.584183,N,39.190964,W"); //replace with coordinates variable
   
   // Draws out sonar circles
   for (int16_t i = 0; i <= 5; i++) {
-  //for (int16_t i = 0; i < 12; i++) {
-    //void drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
       tft.drawCircle(120, 164, radius, ST77XX_GREEN);
       radius = radius + 22;
   }
@@ -157,11 +151,6 @@ void initializeMap(){
   tft.setCursor(114, 176);
   tft.setCursor(114, 170);
   tft.println("X");
-
-//  tft.setCursor(158, 312);
-//  tft.setTextColor(ST77XX_RED);
-//  tft.setFont(&FreeSansBold9pt7b);
-//  tft.println("< V > ^");
 
   // Print available trakker prompt
   tft.setTextColor(ST77XX_GREEN);
@@ -190,11 +179,6 @@ String updateCoordinates(String userLoc){
   return lastLoc;
 }
 
-#define abs(x) ((x)>0?(x):-(x))
-//float deltaLatF, deltaLonF;
-//double deltaLatD, deltaLonD;
-//double ratio, degree;
-
 void updateTrakkers(int x, int y){
   if(i < 12){
     tft.fillCircle(xLast,yLast,8,ST77XX_BLACK);
@@ -216,15 +200,6 @@ void updateTrakkers(int x, int y){
     xLast2 = x2;
     yLast = y;
   }
-//  }
-//  else if(14 <= i < 20){
-//    tft.fillCircle(xLast,yLast,8,ST77XX_BLACK);
-//    printMap();
-//    tft.fillCircle(168,312,3,ST77XX_RED);
-//  }
-
-  //tft.fillCircle(170,312,3,ST77XX_BLUE);
-  //tft.fillCircle(182,312,3,ST77XX_YELLOW);
 }
 
 void printMap(){
