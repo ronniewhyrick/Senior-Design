@@ -89,11 +89,11 @@ void loop() {
       userLoc = bLonS + "N, " + bLatS + "W";
       trakLoc = tLonS + "N, " + tLatS + "W";
       updateCoordinates(userLoc); //Update user's coordinate position
-      updateTrakkers(x, y);
       x -= 4;
       x2 = x - 85;
       y -= 12;
       i++;
+      updateTrakkers(x, y);
       delay(4500);
   }
   i = 0;
