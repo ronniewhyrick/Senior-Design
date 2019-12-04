@@ -51,10 +51,16 @@ const double rLen = 0.02; // Radius of map in km
 const uint8_t pixCount = 110; // Amount of pixels within the radius
 const uint8_t xOff = 120; // x origin of map
 const uint8_t yOff = 164; // y origin of map
+float bLat = -096.58418;
+float bLon =  39.19096;
+float tLat = -096.58282;
+float tLon = 39.18823;
 unsigned long x, y, xLast, yLast;
 uint8_t trakNum;
 int count = 0; // Number of trakkers available
 int out = 0; // Number of trakkers out of bounds
+int i = 0;
+int iterations = 20;
 
 void setup(void) {
   tft.init(240, 320);           
@@ -62,21 +68,25 @@ void setup(void) {
   Serial.begin(9600);
   Backpack.begin(9600);
   tft.setRotation(2);
-  startupScreen();
-  printMap();
+  //startupScreen();
+  initMap();
 }
 
 void loop() {
-  while(Backpack.available()){
-    userLoc = Backpack.readString();
-    updateCoordinates(userLoc); // Update user's coordinate position
-    trakNum = Backpack.readString().toInt();
-    trakLoc = Backpack.readString();
-    updateTrakkers(trakNum, trakLoc); // Gather and print trakker's coordinate positions
-    Serial.print(F("userLoc: "));
-    Serial.println(userLoc);
-    Serial.print(F("trakLoc: "));
-    Serial.println(trakLoc);
+  while(i < iterations){
+    bLat -= 0.00002;
+    bLon += 0.00001;
+    tLat += 0.00002;
+    tLon -= 0.00001;
+    updateCoordinates(bLat, bLon); // Update user's coordinate position
+    updateTrakkers(0, tLat, tLon); // Gather and print trakker's coordinate positions
+    tLat -= 85;
+    updateTrakkers(1, tLat, tLon);
+//    Serial.print(F("userLoc: "));
+//    Serial.println(userLoc);
+//    Serial.print(F("trakLoc: "));
+//    Serial.println(trakLoc);
+    i++;
     delay(2500);
   }
 }
@@ -96,7 +106,7 @@ void startupScreen(){
 }
 
 // Initialize map and prompts on display
-void printMap(){
+void initMap(){
   tft.fillScreen(ST77XX_BLACK);
   tft.setTextColor(ST77XX_GREEN);
   tft.setFont(&FreeMono9pt7b);
@@ -144,7 +154,8 @@ void printMap(){
   tft.println(F("Out of bounds:"));
 }
 
-String updateCoordinates(String userLoc){
+void updateCoordinates(float bLat, float bLon){
+  userLoc = bLon + "N, " + bLat + "W";
   tft.setCursor(0,41);
   tft.setTextColor(ST77XX_BLACK);
   tft.println(lastLoc);
@@ -156,10 +167,9 @@ String updateCoordinates(String userLoc){
   lastLoc = userLoc;
   //Serial.print("lastLoc: ");
   //Serial.println(lastLoc);
-  return lastLoc;
 }
 
-void updateTrakkers(int trakNum, String trakLoc){
+void updateTrakkers(int trakNum, float x, float y){
   int8_t color = ST77XX_BLACK;
   int8_t r = 3; // Radius of trakker point
   // Coordinates of cursor position - intialized at "Trakkers available:"
@@ -168,6 +178,7 @@ void updateTrakkers(int trakNum, String trakLoc){
   int8_t inc = 12; // Cursor position increment size
 
   tft.fillCircle(xLast,yLast,r,color);
+  printMap();
 
   // Sets pixel color based on trakker number
   switch (trakNum) {
@@ -191,14 +202,14 @@ void updateTrakkers(int trakNum, String trakLoc){
   xPlot = 186;
   yPlot = 312;
 
-  int delimLoc = trakLoc.indexOf(',');
-  if(delimLoc >= 0){
-      angle = trakLoc.substring(0,delimLoc).toFloat();
-      mag = trakLoc.substring(delimLoc + 1).toFloat();
-  }
-  // Convert polar coordinates into rectangular
-  x = mag*cos(angle);
-  y = mag *sin(angle);
+//  int delimLoc = trakLoc.indexOf(',');
+//  if(delimLoc >= 0){
+//      angle = trakLoc.substring(0,delimLoc).toFloat();
+//      mag = trakLoc.substring(delimLoc + 1).toFloat();
+//  }
+//  // Convert polar coordinates into rectangular
+//  x = mag*cos(angle);
+//  y = mag *sin(angle);
 
   if(x >= rLen || y >= rLen){
      // Add to out of bounds label
@@ -222,3 +233,22 @@ void updateTrakkers(int trakNum, String trakLoc){
 //    Serial.print(" loc: ");
 //    Serial.println(trakLoc);
 }
+
+void initVals(){
+  bLat = -096.58418;
+  bLon =  39.19096;
+  tLat = -096.58282;
+  tLon = 39.18823;
+  i = 0;
+  out = 0;
+}
+
+void printMap(){
+  uint16_t radius = 0;
+  // Draws out sonar circles
+  for (int16_t i = 0; i <= 5; i++) {
+      tft.drawCircle(120, 164, radius, ST77XX_GREEN);
+      radius = radius + 22;
+  }
+}
+
