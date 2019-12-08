@@ -92,6 +92,7 @@ void loop() {
 //Begin reading Trakker clips
   for (int j = 0; j < 4 ; j++)
   {
+    j = 0;
     while (j == 0 && rxd == false)
     {
       Trakker.write("Tx1");
@@ -135,10 +136,11 @@ void loop() {
          j = -1;
       }
     }
+  
   while(!Trakker.available()){
     /* delay input read in*/
-//    Serial.println("Trakker unavailable");
-//    delay(1000);
+    Serial.println("Trakker unavailable");
+    delay(1000);
     }
   while(Trakker.available())
   {
