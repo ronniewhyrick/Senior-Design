@@ -49,8 +49,8 @@ String userLoc, lastLoc;
 float angle, mag;
 const double rLen = 0.5; // Radius of map in km
 const uint8_t pixCount = 110; // Amount of pixels within the radius
-const int8_t xOff = 120; // x origin of map
-const int8_t yOff = 164; // y origin of map
+const uint8_t xOff = 120; // x origin of map
+const uint8_t yOff = 164; // y origin of map
 float bLat, bLon, tLat, tLon;
 int x, y, xLast, yLast;
 uint8_t trakNum = 1;
