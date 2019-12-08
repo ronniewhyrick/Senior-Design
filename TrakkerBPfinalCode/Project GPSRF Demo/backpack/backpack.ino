@@ -3,9 +3,9 @@
 #define pi 3.14159265358979323846
 #define abs(x) ((x)>0?(x):-(x))
 //establish two software serial ports
-SoftwareSerial GPSModule(10, 9); // RX, TX
+SoftwareSerial GPSModule(10, 9); // RX,TX
 SoftwareSerial Trakker(6, 5); // HC-12 TX Pin, HC-12 RX Pin
-SoftwareSerial lcd(11,3);
+SoftwareSerial lcd(2,3); //RX,TX
 
 int updates,failedUpdates,pos;
 int stringplace = 0;
@@ -19,6 +19,9 @@ String labels[12] {"Time: ", "Status: ", "Latitude: ", "Hemisphere: ", "Longitud
 //backpack unique variables
 String rx_lat,rx_lon;
 bool rxd = false;
+//Example Coordinates centered at KSU Engineering Building
+float B_LonInt = -096.584159;
+float B_LatInt = 39.190953;
 
 float deg2rad(float);
 float rad2deg(float);
@@ -37,8 +40,6 @@ void loop() {
   int latlen;
   float T_LonInt;
   float T_LatInt;
-  float B_LonInt;
-  float B_LatInt; 
   float distancetx,angle;
   float xtx,ytx;
   //Begin reading GPS module
@@ -99,7 +100,7 @@ void loop() {
       delay(2000);
       if (Trakker.available())
       {
-         Trakker.readString();
+         Serial.println(Trakker.readString());
          Serial.println("Trakker1 - Responded ");
          Serial.flush();
          rxd = true;
@@ -134,9 +135,14 @@ void loop() {
          j = -1;
       }
     }
-  while(!Trakker.available()){/* delay input read in*/}
+  while(!Trakker.available()){
+    /* delay input read in*/
+//    Serial.println("Trakker unavailable");
+//    delay(1000);
+    }
   while(Trakker.available())
   {
+    Serial.println("HERE");
     rx_lat = Trakker.readString();
     latlen = rx_lat.length();
     Trakker.flush();
@@ -157,9 +163,6 @@ void loop() {
     Serial.print("Trakker Latitude Rxd: ");
     Serial.println(T_LatInt,5);
      
-   //Example Coordinates centered at KSU Engineering Building
-     B_LonInt = -096.584159;
-     B_LatInt = 39.190953;
    //find magnitude of distance between tracker and backpack
     distancetx = distance(B_LatInt,B_LonInt,T_LatInt,T_LonInt);
     float dy = T_LatInt - B_LatInt;
@@ -203,9 +206,10 @@ void loop() {
     }
     String sxtx = String(xtx);
     String sytx = String(ytx);
-    String tx = sxtx + "," + sytx;
-    char txfinal[25];
-    tx.toCharArray(txfinal,25);
+    String tx = String(B_LatInt) + "," + String(B_LonInt) + "," + sxtx + "," + sytx;
+    int len = tx.length();
+    char txfinal[len];
+    tx.toCharArray(txfinal,len);
     Serial.println("TX to Nano");
     Serial.println(tx);
     Serial.println(xtx);
