@@ -49,8 +49,8 @@ String userLoc, lastLoc;
 float angle, mag;
 const double rLen = 0.5; // Radius of map in km
 const uint8_t pixCount = 110; // Amount of pixels within the radius
-const uint8_t xOff = 120; // x origin of map
-const uint8_t yOff = 164; // y origin of map
+const int8_t xOff = 120; // x origin of map
+const int8_t yOff = 164; // y origin of map
 float bLat, bLon, tLat, tLon;
 int x, y, xLast, yLast;
 uint8_t trakNum = 1;
@@ -155,6 +155,7 @@ void updateCoordinates(String coordinates){
   // Update trakker coordinates:
   tLat = splitString(coordinates);
   tLon = splitString(coordinates);
+  //tLon = -tLon; // Invert tLon to correctly display on TFT axes
   
   tft.setCursor(0,41);
   tft.setTextColor(ST77XX_BLACK);
@@ -203,10 +204,6 @@ void updateTrakkers(int trakNum, float tLat, float tLon){
   }
   xPlot += (inc*count);
   tft.fillCircle(xPlot,yPlot,r,color); // Add to available label
-  Serial.print("Available print at: ");
-  Serial.print(xPlot);
-  Serial.print(", ");
-  Serial.println(yPlot);
   count++;
   // Set cursor at "Out of bounds:"
   xPlot = 186;
@@ -223,6 +220,11 @@ void updateTrakkers(int trakNum, float tLat, float tLon){
      // Convert rectangular coordinates into pixel
      x = (tLat/rLen)*pixCount;
      y = (tLon/rLen)*pixCount;
+     Serial.print("Converted coordinates: ");
+     Serial.print(x);
+     Serial.print(", ");
+     Serial.println(y);
+   
      xPlot = x + xOff; // Add map origin offset
      yPlot = y + yOff;
      tft.fillCircle(xPlot,yPlot,r,color); // Plot trakker
@@ -255,7 +257,7 @@ void printMap(){
   uint16_t radius = 0;
   // Draws out sonar circles
   for (int16_t i = 0; i <= 5; i++) {
-      tft.drawCircle(120, 164, radius, ST77XX_GREEN);
+      tft.drawCircle(xOff, yOff, radius, ST77XX_GREEN);
       radius = radius + 22;
   }
 }
