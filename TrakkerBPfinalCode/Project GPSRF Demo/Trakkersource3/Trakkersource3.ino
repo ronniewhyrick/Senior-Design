@@ -58,7 +58,7 @@ void loop() {
     {
        found = true;
        bpCallID = HC12.readString();
-       Serial.print("Call ID Rxd: ");
+   //    Serial.print("Call ID Rxd: ");
      if (bpCallID == "Tx3")
      {
        Serial.println(bpCallID);
