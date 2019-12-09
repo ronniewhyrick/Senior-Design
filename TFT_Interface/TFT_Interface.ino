@@ -47,7 +47,7 @@ SoftwareSerial Backpack(3,2); //RX,TX
 
 String userLoc, lastLoc;
 float angle, mag;
-const double rLen = 0.5; // Radius of map in km
+const double rLen = 1.8; // Radius of map in km
 const uint8_t pixCount = 110; // Amount of pixels within the radius
 const uint8_t xOff = 120; // x origin of map
 const uint8_t yOff = 164; // y origin of map
@@ -126,7 +126,7 @@ void initMap(){
   tft.setFont();
   tft.setTextColor(ST77XX_GREEN);
   tft.setCursor(106, 258);
-  tft.println(F("3.0 m")); // <---------- abstract this to variable 
+  tft.println(F("36.0 m")); // <---------- abstract this to variable 
 
   // Print user origin position on map
   tft.setTextColor(ST77XX_WHITE);
@@ -155,7 +155,7 @@ void updateCoordinates(String coordinates){
   // Update trakker coordinates:
   tLat = splitString(coordinates);
   tLon = splitString(coordinates);
-  //tLon = -tLon; // Invert tLon to correctly display on TFT axes
+  tLon = -tLon; // Invert tLon to correctly display on TFT axes
   
   tft.setCursor(0,41);
   tft.setTextColor(ST77XX_BLACK);
@@ -205,6 +205,7 @@ void updateTrakkers(int trakNum, float tLat, float tLon){
   xPlot += (inc*count);
   tft.fillCircle(xPlot,yPlot,r,color); // Add to available label
   count++;
+  r = 6;
   // Set cursor at "Out of bounds:"
   xPlot = 186;
   yPlot = 312;
