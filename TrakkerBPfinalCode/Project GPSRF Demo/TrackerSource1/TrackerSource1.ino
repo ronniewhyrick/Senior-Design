@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
 SoftwareSerial GPSModule(11, 10); // RX, TX
-SoftwareSerial HC12(6, 5); // HC-12 TX Pin, HC-12 RX Pin
+SoftwareSerial HC12(6,5); // HC-12 TX Pin, HC-12 RX Pin
 int updates;
 int failedUpdates;
 int pos;
@@ -50,18 +50,18 @@ void loop() {
 //    nmea[2] = ConvertLat();
 //    nmea[4] = ConvertLng();
   }
-  Serial.print ("HC12Listen");
+  //Serial.print ("HC12Listen");
     HC12.listen();
-    while(!HC12.available() && found == false){
-    
-      //wait here till trakker call is received
-//      Serial.println("Trakker not called");
-//      delay(100);
+    while(!HC12.available() && found == false)
+    {
+      //Serial.println("HERE");
+      delay(100);
       }
     while(HC12.available())
     {
        found = true;
        bpCallID = HC12.readString();
+       //Serial.print("Call ID Rxd: ");
       if (bpCallID == "Tx1")
        {
        Serial.print("Call ID Rxd: ");
