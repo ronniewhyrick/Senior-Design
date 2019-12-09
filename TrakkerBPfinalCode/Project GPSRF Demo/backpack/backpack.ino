@@ -92,10 +92,10 @@ void loop() {
 //Begin reading Trakker clips
   for (int j = 0; j < 4 ; j++)
   {
-    j = 0;
     while (j == 0 && rxd == false)
     {
       Trakker.write("Tx1");
+      delay(20);
       Serial.println("Trakker1 - Calling");
       Serial.flush();
       delay(2000);
@@ -139,12 +139,12 @@ void loop() {
   
   while(!Trakker.available()){
     /* delay input read in*/
-    Serial.println("Trakker unavailable");
-    delay(1000);
+    //Serial.println("Trakker unavailable");
+   // delay(1000);
     }
   while(Trakker.available())
   {
-    Serial.println("HERE");
+   // Serial.println("HERE");
     rx_lat = Trakker.readString();
     latlen = rx_lat.length();
     Trakker.flush();
@@ -177,14 +177,14 @@ void loop() {
 
     if (0 < angle && angle < 90)
     {
-      Serial.println("First Quadrant");
+     // Serial.println("First Quadrant");
       xtx = distancetx * cosf(angle * pi/180);
       ytx = distancetx * sinf(angle *pi/180);
       
     }
     else if (angle > 90)
     {
-      Serial.println("Second Quadrant");
+     // Serial.println("Second Quadrant");
       angle = 180 - angle;
       xtx = -1 * distancetx * cosf(angle * pi/180);
       ytx = distancetx * sinf(angle *pi/180);      
@@ -193,14 +193,14 @@ void loop() {
     {
       if (angle < -90)
       {
-        Serial.print("Third Quadrant");
+       // Serial.print("Third Quadrant");
         angle = 180 - abs(angle);
         xtx = -1 * distancetx * cosf(angle * pi/180);
         ytx = -1 * distancetx * sinf(angle *pi/180);          
       }
       else
       {
-        Serial.print("Fourth Quadrant");
+       // Serial.print("Fourth Quadrant");
         angle = abs(angle);
         xtx = distancetx * cosf(angle * pi/180);
         ytx = -1 * distancetx * sinf(angle *pi/180);          
@@ -212,10 +212,10 @@ void loop() {
     int len = tx.length();
     char txfinal[len];
     tx.toCharArray(txfinal,len);
-    Serial.println("TX to Nano");
-    Serial.println(tx);
-    Serial.println(xtx);
-    Serial.println(ytx);
+    //Serial.println("TX to Nano");
+    //Serial.println(tx);
+    //Serial.println(xtx);
+    //Serial.println(ytx);
     lcd.write(txfinal);
 
    // lcd.write(ytx);
