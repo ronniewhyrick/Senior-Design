@@ -46,39 +46,40 @@ Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RS
 SoftwareSerial Backpack(3,2); //RX,TX
 
 String userLoc, lastLoc;
-float angle, mag;
 const double rLen = 1.8; // Radius of map in km
 const uint8_t pixCount = 110; // Amount of pixels within the radius
 const uint8_t xOff = 120; // x origin of map
 const uint8_t yOff = 164; // y origin of map
 float bLat, bLon, tLat, tLon;
-int x, y, xLast, yLast;
-uint8_t trakNum = 1;
+int x, y, x1Last, x2Last, x3Last, y1Last, y2Last, y3Last;
+uint8_t trakNum = 0;
 int count = 0; // Number of trakkers available
 int out = 0; // Number of trakkers out of bounds
 int i = 0;
 int loc1, loc2;
-int iterations = 20;
 
 void setup(void) {
   tft.init(240, 320);           
   tft.fillScreen(ST77XX_BLACK);
   Serial.begin(9600);
   Backpack.begin(9600);
-  tft.setRotation(2);
+  //tft.setRotation(2);
   //startupScreen();
   initMap();
 }
 
 void loop() {
   while(Backpack.available()){
-    String coordinates = Backpack.readString();
-    updateCoordinates(coordinates); // Update user's coordinate position
-    updateTrakkers(0, tLat, tLon); // Gather and print trakker's coordinate positions
+    if(trakNum < 3){
+      String coordinates = Backpack.readString();
+      updateCoordinates(coordinates); // Update user's coordinate position
+      updateTrakkers(trakNum, tLat, tLon); // Gather and print trakker's coordinate positions
 //    Serial.print(F("userLoc: "));
 //    Serial.println(userLoc);
 //    Serial.print(F("trakLoc: "));
-  }//trakNum++;
+      trakNum++;
+    }trakNum = 0;
+  }
 }
 
 // Printout for the startup display
@@ -126,7 +127,7 @@ void initMap(){
   tft.setFont();
   tft.setTextColor(ST77XX_GREEN);
   tft.setCursor(106, 258);
-  tft.println(F("36.0 m")); // <---------- abstract this to variable 
+  tft.println(F("36.0 m"));
 
   // Print user origin position on map
   tft.setTextColor(ST77XX_WHITE);
@@ -171,78 +172,97 @@ void updateCoordinates(String coordinates){
 }
 
 void updateTrakkers(int trakNum, float tLat, float tLon){
-  Serial.print("Coordinates: ");
-  Serial.print(tLat);
-  Serial.print(", ");
-  Serial.println(tLon);
-  Serial.print("Trakker number: ");
-  Serial.println(trakNum);
+//  Serial.print("Coordinates: ");
+//  Serial.print(tLat);
+//  Serial.print(", ");
+//  Serial.println(tLon);
+//  Serial.print("Trakker number: ");
+//  Serial.println(trakNum);
   uint16_t color = ST77XX_BLACK;
-  uint8_t r = 3; // Radius of trakker point
+  uint8_t r = 6; // Radius of trakker point
   // Coordinates of cursor position - intialized at "Trakkers available:"
   int xPlot = 211; // x coordinate
   int yPlot = 297; // y coordinate
   int8_t inc = 12; // Cursor position increment size
 
-  tft.fillCircle(xLast,yLast,r,color);
-  printMap();
-
   // Sets pixel color based on trakker number
   switch (trakNum) {
     case 0:
-      color = ST77XX_RED;
+      if(x1Last != 0 && y1Last != 0){
+        tft.fillCircle(x1Last,y1Last,r,color);
+      }color = ST77XX_RED;
       break;
     case 1:
-      color = ST77XX_BLUE;
+      if(x2Last != 0 && y2Last != 0){
+        tft.fillCircle(x2Last,y2Last,r,color);
+      }color = ST77XX_BLUE;
       break;
     case 2:
-      color = ST77XX_YELLOW;
+      if(x3Last != 0 && y3Last != 0){
+        tft.fillCircle(x3Last,y3Last,r,color);
+      }color = ST77XX_YELLOW;
       break;
     default:
       color = ST77XX_BLACK;
       break;
   }
+  printMap();
+  r = 3;
   xPlot += (inc*count);
   tft.fillCircle(xPlot,yPlot,r,color); // Add to available label
   count++;
-  r = 6;
   // Set cursor at "Out of bounds:"
-  xPlot = 186;
+  xPlot = 156;
   yPlot = 312;
 
   if(tLat >= rLen || tLon >= rLen){
+    if(out < 3){
      // Add to out of bounds label
      xPlot += (inc*out);
      tft.fillCircle(xPlot,yPlot,r,color);
      out++;
-     Serial.println("Out of bounds");
+    }
+    out = 0;
+    xPlot += (inc*out);
+    tft.fillCircle(xPlot,yPlot,r,color);
+    out++;
+//     Serial.println("Out of bounds");
   }
   else{
+     r = 6;
      // Convert rectangular coordinates into pixel
      x = (tLat/rLen)*pixCount;
      y = (tLon/rLen)*pixCount;
-     Serial.print("Converted coordinates: ");
-     Serial.print(x);
-     Serial.print(", ");
-     Serial.println(y);
+//     Serial.print("Converted coordinates: ");
+//     Serial.print(x);
+//     Serial.print(", ");
+//     Serial.println(y);
    
      xPlot = x + xOff; // Add map origin offset
      yPlot = y + yOff;
      tft.fillCircle(xPlot,yPlot,r,color); // Plot trakker
-     Serial.print("Trakker printed at: ");
-     Serial.print(xPlot);
-     Serial.print(", ");
-     Serial.println(yPlot);
-     Serial.print("With color: ");
-     Serial.println(color);
+//     Serial.print("Trakker printed at: ");
+//     Serial.print(xPlot);
+//     Serial.print(", ");
+//     Serial.println(yPlot);
+//     Serial.print("With color: ");
+//     Serial.println(color);
   }
-  xLast = xPlot;
-  yLast = yPlot;
-
-//    Serial.print("Trakker ");
-//    Serial.print(trakkerNum);
-//    Serial.print(" loc: ");
-//    Serial.println(trakLoc);
+  // Save trakker location for erase
+  switch (trakNum) {
+    case 0:
+      x1Last = xPlot;
+      y1Last = yPlot;
+      break;
+    case 1:
+      x2Last = xPlot;
+      y2Last = yPlot;
+      break;
+    case 2:
+      x3Last = xPlot;
+      y3Last = yPlot;
+      break;
+  }
 }
 
 float splitString(String coordinates){
